@@ -1,5 +1,9 @@
 # 给另一个 AI 的站点语言路由改造提示词
 
+> Historical note:
+> this prompt has already been used and the locale-routing implementation has landed in `fzhang.dev`.
+> Keep this file as an archive / reusable brief, not as an open task by default.
+
 你现在要修改 `fzhang.dev` 的语言切换机制，不要只做表层翻译插件。
 
 目标是让站点、清单、后续通知邮件都能根据访问者语言自动进入合适的语言版本。
