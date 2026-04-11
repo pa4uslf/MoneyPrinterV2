@@ -43,7 +43,7 @@ Current gap summary:
 - topic scoring is not implemented yet
 - affiliate-safe comparison / recommendation clusters are not defined yet
 - welcome email, unsubscribe visibility, tagging, and low-frequency topic sends still need final verification
-- English-thread outreach now has translation support, but still needs validation that translated pages actually improve comprehension and checklist conversion
+- English-thread outreach now has translation support, but still needs validation that translated pages actually improve comprehension and checklist conversion; conversion-critical pages may still need native English fallbacks
 - `shop.fzhang.dev` payment architecture is now decided in principle, but not yet implemented in code
 - `InsForge` is intentionally deferred unless the shop backend becomes a real bottleneck after payment integration
 - distribution validation has a plan, but still needs real channel actions and logged results
