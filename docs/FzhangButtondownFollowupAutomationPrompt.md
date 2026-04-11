@@ -19,6 +19,7 @@
 - 资源先站内即时解锁
 - 再发少量订阅后续邮件
 - 后续如果这条主题下扩展出新文章、资源、SOP，也能优先发给这批人
+- 如果站点已经按语言路由，邮件也要按语言分别发送
 
 但前提是：
 
@@ -104,11 +105,14 @@
 - `resource-checklist`
 - `topic-deployment`
 - `source-fzhang-dev`
+- `locale-en`
+- `locale-zh`
 
 并回答：
 
 - 后续新文章应该如何进入这条线
 - 是靠 tags 发，还是靠独立 automation，还是靠 RSS cadence
+- 英文订阅者和中文订阅者是否应该走不同的邮件模板
 
 ### 任务 4：回答“会不会增加太多负担”
 
@@ -117,6 +121,7 @@
 - 当前最省力的实现是什么
 - 哪种实现会明显增加 Frank 的长期负担
 - 应该避免哪些“看起来先进、实际很重”的自动化设计
+- 站点自动语言切换是否需要同时驱动邮件语言切换
 
 ### 任务 5：给出建议的最终架构
 
@@ -125,6 +130,10 @@
 例如：
 
 `资源页 -> 站内即时解锁 -> API -> Buttondown subscriber + tags -> confirmation -> welcome email -> 按 topic-deployment 低频分群发送`
+
+如果站点已经识别到语言偏好，这条链路可以再细分成：
+
+`资源页 -> 站内即时解锁 -> API -> Buttondown subscriber + tags + locale -> confirmation -> locale-aware welcome email -> 按 topic-deployment + locale 低频发送`
 
 ## 输出要求
 
