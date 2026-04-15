@@ -95,6 +95,12 @@ class Twitter:
         "avoid deployment mistakes",
         "safer first release",
     )
+    _VALID_BAD_INSTINCT_PREFIXES = (
+        "the bad instinct is to ",
+        "most builders assume ",
+        "the risky default is to ",
+        "the mistake is to ",
+    )
 
     def _variant_instruction(self) -> str:
         """
@@ -307,6 +313,123 @@ class Twitter:
             return False
         return any(keyword in normalized for keyword in self._FIRST_MOVE_ACTION_KEYWORDS)
 
+    def _is_valid_bad_instinct(self, text: str) -> tuple[bool, str]:
+        """
+        Validates that bad_instinct is an explicit mistaken-instinct sentence, not a status or consequence.
+
+        Args:
+            text (str): Candidate bad instinct
+
+        Returns:
+            valid (bool): True when valid
+            reason (str): Failure reason or ok
+        """
+        normalized = self._normalize_short_text(text)
+        if not normalized:
+            return False, "empty"
+
+        if not normalized.startswith(self._VALID_BAD_INSTINCT_PREFIXES):
+            return False, "must use an allowed mistaken-instinct sentence starter"
+
+        status_markers = (
+            "unclear",
+            "confusing",
+            "might accidentally",
+            "i might",
+            "there is a risk",
+        )
+        if any(marker in normalized for marker in status_markers):
+            return False, "describes state or consequence instead of mistaken instinct"
+
+        return True, "ok"
+
+    def _compress_tweet_safely(self, scene: str, bad_instinct: str, first_move: str) -> tuple[str, str, str]:
+        """
+        Compresses sentence parts without breaking sentence integrity.
+
+        Args:
+            scene (str): Scene sentence body
+            bad_instinct (str): Bad instinct sentence body
+            first_move (str): First move sentence body
+
+        Returns:
+            scene (str): Compressed scene
+            bad_instinct (str): Compressed bad instinct
+            first_move (str): Compressed first move
+        """
+        variants = [
+            (
+                scene,
+                bad_instinct,
+                first_move,
+            ),
+            (
+                scene.replace("right before", "before").replace("the first", "your first"),
+                bad_instinct,
+                first_move,
+            ),
+            (
+                scene.replace("right before", "before").replace("the first", "your first").replace(" through nginx", ""),
+                bad_instinct,
+                first_move.split(",", 1)[0].strip(),
+            ),
+            (
+                scene.replace("right before", "before").replace("the first", "your first").replace(" through nginx", ""),
+                bad_instinct.replace("production readiness", "prod-ready"),
+                first_move.split(",", 1)[0].strip(),
+            ),
+        ]
+
+        for candidate_scene, candidate_bad_instinct, candidate_first_move in variants:
+            candidate_tweet = ". ".join(
+                [
+                    part.rstrip(". ")
+                    for part in (candidate_scene, candidate_bad_instinct, candidate_first_move)
+                    if part
+                ]
+            ).strip()
+            candidate_tweet = self._sanitize_tweet_render(candidate_tweet)
+            if len(candidate_tweet) <= self._MAX_TWEET_LENGTH:
+                return candidate_scene, candidate_bad_instinct, candidate_first_move
+
+        return variants[-1]
+
+    def _render_complete_tweet(self, scene: str, bad_instinct: str, first_move: str) -> tuple[str, bool]:
+        """
+        Renders a complete-sentence tweet from core slots only.
+
+        Args:
+            scene (str): Scene
+            bad_instinct (str): Bad instinct
+            first_move (str): First move
+
+        Returns:
+            tweet (str): Final tweet
+            render_complete (bool): Whether the result kept complete sentence structure
+        """
+        scene, bad_instinct, first_move = self._compress_tweet_safely(
+            scene,
+            bad_instinct,
+            first_move,
+        )
+        tweet = ". ".join(
+            [
+                part.rstrip(". ")
+                for part in (scene, bad_instinct, first_move)
+                if part
+            ]
+        ).strip()
+        tweet = self._sanitize_tweet_render(tweet)
+        render_complete = (
+            bool(tweet)
+            and len(tweet) <= self._MAX_TWEET_LENGTH
+            and not tweet.endswith(" the")
+            and not tweet.endswith(" to")
+            and not tweet.endswith(" and")
+            and not tweet.endswith(" or")
+        )
+        return tweet, render_complete
+
     def _generate_tweet_slots(self) -> dict:
         """
         Generates structured slots for final tweet rendering.
@@ -340,7 +463,12 @@ class Twitter:
 
             Requirements:
             - scene must be concrete
-            - bad_instinct must read like a bad instinct, dangerous default, or common misjudgment
+            - bad_instinct must use one of these sentence forms:
+              - the bad instinct is to ...
+              - most builders assume ...
+              - the risky default is to ...
+              - the mistake is to ...
+            - bad_instinct must describe a wrong idea or dangerous default, not a vague state, confusion, or consequence
             - first_move must start with one of: check, verify, inspect, list, compare, disable, trace, review
             - first_move must point to a deployment/config/product-internal action
             - first_move must not be a checklist, guide, template, or download action
@@ -367,13 +495,8 @@ class Twitter:
         first_move = str(slots.get("first_move", "") or "").strip()
         optional_cta = str(slots.get("optional_cta", "") or "").strip()
 
-        bad_instinct_normalized = self._normalize_short_text(bad_instinct)
-        bad_instinct_valid = bool(bad_instinct) and (
-            "bad instinct" in bad_instinct_normalized
-            or "dangerous default" in bad_instinct_normalized
-            or "assume" in bad_instinct_normalized
-            or "trust localhost" in bad_instinct_normalized
-            or "default" in bad_instinct_normalized
+        bad_instinct_valid, bad_instinct_reason = self._is_valid_bad_instinct(
+            bad_instinct
         )
 
         return {
@@ -383,6 +506,7 @@ class Twitter:
             "optional_cta": optional_cta,
             "scene_valid": bool(scene),
             "bad_instinct_valid": bad_instinct_valid,
+            "bad_instinct_reason": bad_instinct_reason,
             "first_move_valid": self._is_valid_first_move(first_move),
             "cta_shadow": self._contains_cta_shadow(optional_cta)
             or self._contains_cta_shadow(first_move),
@@ -429,18 +553,7 @@ class Twitter:
         Returns:
             tweet (str): Final tweet
         """
-        parts = []
-        if scene:
-            parts.append(scene.strip())
-        if bad_instinct:
-            parts.append(bad_instinct.strip())
-        if first_move:
-            parts.append(first_move.strip())
-
-        tweet = ". ".join(part.rstrip(". ") for part in parts if part).strip()
-        tweet = self._sanitize_tweet_render(tweet)
-        if len(tweet) > self._MAX_TWEET_LENGTH:
-            tweet = tweet[: self._MAX_TWEET_LENGTH].rsplit(" ", 1)[0].rstrip(" .,:;-")
+        tweet, _ = self._render_complete_tweet(scene, bad_instinct, first_move)
         return tweet
 
     def _review_json_prompt(self, draft: str) -> str:
@@ -761,11 +874,13 @@ class Twitter:
             if validation is None:
                 completion = ""
             else:
-                completion = self._render_tweet_from_slots(
+                completion, render_complete = self._render_complete_tweet(
                     validation["scene"],
                     validation["bad_instinct"],
                     validation["first_move"],
                 )
+                if not render_complete:
+                    warning("Rendered tweet was not complete after safe compression.", False)
         else:
             completion = generate_text(
                 f"Generate a Twitter post about: {self.topic} in {get_twitter_language()}. "
