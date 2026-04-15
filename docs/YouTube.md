@@ -4,6 +4,36 @@ MPV2 uses a similar implementation of V1 (see [MPV1](https://github.com/Fujiwara
 
 In contrast to V1, V2 uses AI generated images as the visuals for the video, instead of using stock footage. This makes the videos more unique and less likely to be flagged by YouTube. V2 also supports music right from the get-go.
 
+## Acceptance Standard
+
+The YouTube chain is not the current optimization focus, but it does have a minimum acceptance bar.
+
+For the current deployment-content lane, a passing script should preserve:
+
+1. a concrete scene
+2. a mistaken assumption / blind spot
+3. why the usual approach fails in that scene
+4. a first concrete move
+5. only then a natural next step
+
+What this means in practice:
+
+- the opening should be a real deployment moment, not a generic technical thesis
+- the script should not reduce the middle to broad risk reminders
+- the action step should remain an internal deployment/config action, not a generic CTA
+
+### Baseline Runtime
+
+- provider: `Ollama local API`
+- model: `qwen2.5:3b`
+- temperature: `0`
+- stream: `false`
+- num_predict: `220`
+
+Regression reference:
+
+- `docs/RegressionSamples.md`
+
 ## Relevant Configuration
 
 In your `config.json`, you need the following attributes filled out, so that the bot can function correctly.

@@ -25,6 +25,25 @@ And the final tweet must also satisfy:
 - no `expected_attribute` leak
 - complete sentence rendering
 
+### Programmatic Constraints
+
+The current Twitter/X chain is intentionally locked to a narrow structure.
+
+The final tweet should be rendered only from:
+
+1. `scene`
+2. `bad_instinct`
+3. `first_move`
+
+Current hard rules:
+
+- `bad_instinct` must be an explicit wrong-idea sentence, not a vague status description
+- `first_move` must be a product-internal / deployment-internal action
+- CTA is off by default
+- CTA shadow is not allowed
+- `expected_attribute` wording or close paraphrases are not allowed in the final tweet
+- rendering must keep complete sentences and avoid half-cut endings
+
 ### Current Stop Rule
 
 Do not continue optimizing this Twitter/X chain by default.
@@ -50,6 +69,18 @@ The current baseline already passed the narrow acceptance gate for:
 
 So the next default action is not more Twitter tuning.
 The next default action is to leave this lane stable and spend attention elsewhere.
+
+### Baseline Runtime
+
+- provider: `Ollama local API`
+- model: `qwen2.5:3b`
+- temperature: `0`
+- stream: `false`
+- num_predict: `220`
+
+Regression reference:
+
+- `docs/RegressionSamples.md`
 
 ## Relevant Configuration
 
