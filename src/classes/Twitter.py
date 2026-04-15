@@ -9,9 +9,11 @@ from config import *
 from status import *
 from llm_provider import generate_text
 from content_profile import (
+    build_required_field_status,
     build_profile_context,
     has_service_strategy,
     load_case_brief,
+    missing_required_strategy_fields,
     normalize_content_profile,
 )
 from typing import List, Optional
@@ -74,7 +76,21 @@ class Twitter:
             f"Primary asset type: {asset_type or 'general content asset'}. "
             f"Capture type: {capture_type or 'none'}. "
             f"Monetization type: {monetization_type or 'none'}. "
-            "The post should nudge the reader toward a reusable asset or owned relationship, not only a direct service sale."
+            "The post should nudge the reader toward a reusable business asset, owned destination, or owned relationship, not only a direct service sale."
+        )
+
+    def _demand_diagnostics_instruction(self) -> str:
+        """
+        Returns a compact instruction block for persona, scene, KANO, and stakeholder checks.
+
+        Returns:
+            instruction (str): Diagnostic guidance for prompt use
+        """
+        return (
+            "Silently diagnose the topic before writing: identify the reader's real role, "
+            "their strongest scene, what triggered the need now, what they fear will happen, "
+            "which expected attribute must be delivered with certainty, what would only be a delighter, "
+            "what could become a reverse attribute, and which stakeholder roles support or resist the next move."
         )
 
     def __init__(
@@ -102,6 +118,9 @@ class Twitter:
         self.topic: str = topic
         self.content_profile = normalize_content_profile(content_profile)
         self.case_brief = load_case_brief(self.content_profile)
+        self.missing_required_fields = missing_required_strategy_fields(
+            self.content_profile
+        )
 
         # Initialize the Firefox profile
         self.options: Options = Options()
@@ -261,6 +280,13 @@ class Twitter:
             post (str): The post
         """
         if has_service_strategy(self.content_profile):
+            if self.missing_required_fields:
+                warning(
+                    "Missing required strategy fields for X generation: "
+                    + ", ".join(self.missing_required_fields)
+                    + ". Falling back to explicit downgrade logic.",
+                    False,
+                )
             completion = generate_text(
                 f"""
                 Write a concise X post in {get_twitter_language()} for a technical content and audience-building business.
@@ -273,13 +299,20 @@ class Twitter:
                 {self._variant_instruction()}
                 Asset guidance:
                 {self._asset_instruction()}
+                Required field status:
+                {build_required_field_status(self.content_profile)}
+                Demand diagnostics:
+                {self._demand_diagnostics_instruction()}
 
                 Requirements:
                 - Maximum 240 characters
                 - Sound like a calm operator, not a hype marketer
-                - Mention one concrete problem and one practical insight
+                - Start from one strong scene or moment of tension, not a generic thesis
+                - Mention one costly blind spot or mistaken assumption
+                - Give one practical next move or principle
                 - Prefer deployment, security, workflow, cost, or implementation lessons
                 - Avoid generic inspiration, vague AI hot takes, and empty engagement bait
+                - Prioritize the expected attribute over decorative details
                 - If there is a CTA, point to a reusable asset, subscription, download, or owned destination before direct selling
                 - Only return the post text
                 """
@@ -322,7 +355,7 @@ class Twitter:
         """
         reviewed = generate_text(
             f"""
-            Review and improve this X post for a technical asset-building operator.
+            Review and improve this X post for a technical reusable-business-asset operator.
 
             Draft:
             {draft}
@@ -336,16 +369,57 @@ class Twitter:
             {self._variant_instruction()}
             Asset guidance:
             {self._asset_instruction()}
+            Required field status:
+            {build_required_field_status(self.content_profile)}
+            Demand diagnostics:
+            {self._demand_diagnostics_instruction()}
+
+            Return valid JSON only with this schema:
+            {{
+              "final_post": "revised post",
+              "checks": {{
+                "scene_present": true,
+                "blind_spot_present": true,
+                "first_move_present": true,
+                "expected_attribute_present": true
+              }},
+              "missing_items": ["scene", "blind_spot"]
+            }}
 
             Requirements:
             - Keep the core meaning
             - Remove hype, fluff, and generic AI phrasing
-            - Make it sound specific, credible, and useful
+            - Make it sound specific, credible, useful, and scene-accurate
+            - Preserve one concrete blind spot and one practical next move
+            - Avoid overemphasizing delighters or reverse attributes
             - Prefer owned-audience or reusable-asset direction over hard selling
             - Keep it under 240 characters
-            - Only return the final post
+            - Explicitly check whether the post contains:
+              1. a concrete scene
+              2. a blind spot or mistaken assumption
+              3. a first move
+              4. the expected attribute or promised outcome
+            - If any item is still missing after revision, list it in missing_items
             """
         )
 
-        cleaned = re.sub(r"\*", "", reviewed).replace('"', "").strip()
-        return cleaned or draft
+        cleaned = reviewed.replace("```json", "").replace("```", "").strip()
+        try:
+            parsed = json.loads(cleaned)
+            final_post = (
+                str(parsed.get("final_post", "")).replace('"', "").strip() or draft
+            )
+            missing_items = parsed.get("missing_items", [])
+            if missing_items:
+                warning(
+                    "X review missing items: " + ", ".join(str(item) for item in missing_items),
+                    False,
+                )
+            return re.sub(r"\*", "", final_post)
+        except Exception:
+            cleaned_post = re.sub(r"\*", "", reviewed).replace('"', "").strip()
+            warning(
+                "X review did not return structured checks. Falling back to reviewed text.",
+                False,
+            )
+            return cleaned_post or draft

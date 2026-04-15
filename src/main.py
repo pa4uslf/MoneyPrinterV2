@@ -44,6 +44,15 @@ def prompt_content_profile(default_topic: str, account_type: str) -> dict:
     target_customer = question(
         " => Target customer (e.g. indie hackers, founders, small teams): "
     ).strip()
+    desired_identity = question(
+        " => Desired identity of this reader (e.g. calm operator, reliable tech owner): "
+    ).strip()
+    avoided_identity = question(
+        " => Avoided identity / fear (e.g. careless deployer, shiny-tool collector): "
+    ).strip()
+    self_investment = question(
+        " => What are they already investing in to stay this kind of person? "
+    ).strip()
     content_variant = question(
         " => Content variant (deployment/hardening/comparison/cost/general): "
     ).strip().lower()
@@ -62,8 +71,35 @@ def prompt_content_profile(default_topic: str, account_type: str) -> dict:
     offer_name = question(
         f" => Optional supporting offer promoted by this {account_type} account: "
     ).strip()
+    strongest_scene = question(
+        " => Strongest real-world scene (e.g. before first public deploy on VPS): "
+    ).strip()
+    trigger_moment = question(
+        " => Trigger moment / why now (e.g. local worked, server broke): "
+    ).strip()
+    feared_outcome = question(
+        " => Feared outcome (e.g. expose admin panel, waste a week, break prod): "
+    ).strip()
     primary_problem = question(" => Main problem you solve for them: ").strip()
     desired_outcome = question(" => Desired customer outcome: ").strip()
+    value_mix = question(
+        " => Value mix (comma-separated: functional, reassurance, delight, status, talkability): "
+    ).strip()
+    expected_attribute = question(
+        " => Expected attribute that must be delivered with certainty: "
+    ).strip()
+    delighter = question(
+        " => Optional delighter / surprise benefit (optional): "
+    ).strip()
+    reverse_attribute = question(
+        " => Likely reverse attribute / overkill to avoid (optional): "
+    ).strip()
+    supporter_roles = question(
+        " => Supporter roles, comma-separated (optional): "
+    ).strip()
+    blocker_roles = question(
+        " => Blocker roles, comma-separated (optional): "
+    ).strip()
     cta_url = question(" => CTA URL (optional): ").strip()
     case_brief_file = question(
         " => Case brief file path relative to repo (optional): "
@@ -85,10 +121,22 @@ def prompt_content_profile(default_topic: str, account_type: str) -> dict:
         "capture_type": capture_type,
         "monetization_type": monetization_type,
         "target_customer": target_customer,
+        "desired_identity": desired_identity,
+        "avoided_identity": avoided_identity,
+        "self_investment": self_investment,
         "offer_name": offer_name,
         "asset_name": asset_name,
+        "strongest_scene": strongest_scene,
+        "trigger_moment": trigger_moment,
+        "feared_outcome": feared_outcome,
         "primary_problem": primary_problem,
         "desired_outcome": desired_outcome,
+        "value_mix": value_mix,
+        "expected_attribute": expected_attribute,
+        "delighter": delighter,
+        "reverse_attribute": reverse_attribute,
+        "supporter_roles": supporter_roles,
+        "blocker_roles": blocker_roles,
         "cta_url": cta_url,
         "case_brief_file": case_brief_file,
         "proof_points": proof_points,

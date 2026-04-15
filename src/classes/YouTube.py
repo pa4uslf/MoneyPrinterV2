@@ -14,9 +14,11 @@ from config import *
 from status import *
 from uuid import uuid4
 from content_profile import (
+    build_required_field_status,
     build_profile_context,
     has_service_strategy,
     load_case_brief,
+    missing_required_strategy_fields,
     normalize_content_profile,
 )
 from constants import *
@@ -96,7 +98,22 @@ class YouTube:
             f"Capture type: {capture_type or 'none'}. "
             f"Monetization type: {monetization_type or 'none'}. "
             f"Asset name: {asset_name or 'none'}. "
-            "The video should help build reusable audience and asset value before pushing direct services."
+            "The video should help build reusable audience and business-asset leverage before pushing direct services."
+        )
+
+    def _demand_diagnostics_instruction(self) -> str:
+        """
+        Returns a compact instruction block covering persona, scene, KANO, stakeholders, and business-loop checks.
+
+        Returns:
+            instruction (str): Diagnostic guidance for prompt use
+        """
+        return (
+            "Silently diagnose the opportunity before writing: identify the reader's real role, "
+            "their strongest scene, what triggered the need now, what they fear will happen, "
+            "their desired identity, avoided identity, current self-investment, which expected attribute "
+            "must be delivered with certainty, what would only delight, what would become a reverse attribute, "
+            "which stakeholder roles support or resist action, and what owned next step would prove movement."
         )
 
     def __init__(
@@ -128,6 +145,9 @@ class YouTube:
         self._language: str = language
         self.content_profile = normalize_content_profile(content_profile)
         self.case_brief = load_case_brief(self.content_profile)
+        self.missing_required_fields = missing_required_strategy_fields(
+            self.content_profile
+        )
 
         self.images = []
 
@@ -194,6 +214,13 @@ class YouTube:
             topic (str): The generated topic.
         """
         if has_service_strategy(self.content_profile):
+            if self.missing_required_fields:
+                warning(
+                    "Missing required strategy fields for YouTube generation: "
+                    + ", ".join(self.missing_required_fields)
+                    + ". Falling back to explicit downgrade logic.",
+                    False,
+                )
             completion = self.generate_response(
                 f"""
                 You are planning a short-form educational video that grows durable content assets and owned audience around technical workflows.
@@ -207,6 +234,10 @@ class YouTube:
                 {self._variant_instruction()}
                 Asset guidance:
                 {self._asset_instruction()}
+                Required field status:
+                {build_required_field_status(self.content_profile)}
+                Demand diagnostics:
+                {self._demand_diagnostics_instruction()}
 
                 Generate one concrete short-video angle in exactly one sentence.
 
@@ -214,7 +245,8 @@ class YouTube:
                 - Make it practical, credibility-first, and useful enough to support long-tail discovery.
                 - Prefer deployment lessons, security pitfalls, implementation trade-offs, cost trade-offs, or reusable workflow outcomes.
                 - Avoid vague motivation, generic AI news, and broad listicles.
-                - The angle should feel like something a builder would search, save, or subscribe for.
+                - Root it in one strong scene, one costly mistake, and one clear reader identity.
+                - It should feel like something a builder would search, save, or subscribe for.
                 - Only return the topic sentence.
                 """
             )
@@ -252,21 +284,30 @@ class YouTube:
             {self._variant_instruction()}
             Asset guidance:
             {self._asset_instruction()}
+            Required field status:
+            {build_required_field_status(self.content_profile)}
+            Demand diagnostics:
+            {self._demand_diagnostics_instruction()}
 
             Script goals:
             - Attract the right reader/viewer, not broad entertainment traffic.
             - Sound like a calm technical operator explaining a real-world lesson.
             - Make the audience feel "this is worth saving or subscribing for".
+            - Build trust through scene accuracy and credible judgment, not hype.
 
             Structure:
-            - Sentence 1: Name a concrete problem, failure mode, or costly mistake.
-            - Sentence 2: Explain why it happens or what most people miss.
-            - Sentence 3: Show the practical fix, principle, or workflow.
-            - Sentence 4: Describe the reusable outcome, next step, or soft asset CTA.
+            - Sentence 1: Open with the exact scene and moment of tension.
+            - Sentence 2: Name the mistaken assumption, blind spot, or hidden blocker.
+            - Sentence 3: Explain why the usual approach fails in this scene.
+            - Sentence 4: State the core principle in plain language.
+            - Sentence 5: Give the first concrete next move.
+            - Sentence 6: Point to the reusable next step only if it is the natural execution layer.
 
             Rules:
             - No markdown, no title, no bullet points.
             - No hype, no empty inspiration, no "welcome back".
+            - Prioritize the expected attribute over decorative details.
+            - Do not overload the script with delighters if they weaken clarity.
             - Do not mention the prompt or the sentence count.
             - Only return the raw script.
             """
@@ -335,12 +376,17 @@ class YouTube:
                 {self._variant_instruction()}
                 Asset guidance:
                 {self._asset_instruction()}
+                Required field status:
+                {build_required_field_status(self.content_profile)}
+                Demand diagnostics:
+                {self._demand_diagnostics_instruction()}
 
                 Requirements:
                 - Under 90 characters
                 - Specific and useful, not clickbait
                 - May use 1-2 targeted hashtags if they help
                 - Should signal a real deployment, security, automation, or implementation lesson
+                - Prefer scene clarity and expected outcome over decorative promise
                 - Prefer searchable clarity over generic persuasion
                 - Only return the title
                 """
@@ -370,11 +416,16 @@ class YouTube:
                 {self._variant_instruction()}
                 Asset guidance:
                 {self._asset_instruction()}
+                Required field status:
+                {build_required_field_status(self.content_profile)}
+                Demand diagnostics:
+                {self._demand_diagnostics_instruction()}
 
                 Requirements:
                 - Summarize the lesson in 2-4 short lines
                 - Sound practical and trustworthy
                 - Mention the target outcome for the audience
+                - Make the next move feel concrete, not abstract
                 - Include a soft CTA to subscribe, download, or learn more
                 - If a CTA URL is present in the context, include it naturally
                 - Only return the description
@@ -415,6 +466,10 @@ class YouTube:
             {self._variant_instruction()}
             Asset guidance:
             {self._asset_instruction()}
+            Required field status:
+            {build_required_field_status(self.content_profile)}
+            Demand diagnostics:
+            {self._demand_diagnostics_instruction()}
 
             Visual direction:
             - product UI mockups
@@ -426,7 +481,7 @@ class YouTube:
             Rules:
             - Return a JSON array of strings only
             - Each prompt should be a full sentence
-            - Keep prompts grounded, professional, and visually coherent
+            - Keep prompts grounded, professional, visually coherent, and tied to the strongest scene
             - Avoid fantasy art, surrealism, and generic motivational imagery
             - Do not repeat the script verbatim
             """
@@ -523,18 +578,58 @@ class YouTube:
             {self._variant_instruction()}
             Asset guidance:
             {self._asset_instruction()}
+            Required field status:
+            {build_required_field_status(self.content_profile)}
+            Demand diagnostics:
+            {self._demand_diagnostics_instruction()}
+
+            Return valid JSON only with this schema:
+            {{
+              "final_script": "revised script",
+              "checks": {{
+                "scene_present": true,
+                "blind_spot_present": true,
+                "first_move_present": true,
+                "expected_attribute_present": true
+              }},
+              "missing_items": ["scene", "first_move"]
+            }}
 
             Requirements:
             - Keep it concise and practical
             - Remove hype, filler, and vague wording
             - Keep the tone calm and operator-like
             - Make the reusable value to the reader obvious
-            - Only return the final script
+            - Ensure each line still tracks a real scene, blind spot, and next move
+            - Cut decorative claims that do not support the expected attribute
+            - Explicitly check whether the script contains:
+              1. a concrete scene
+              2. a blind spot or mistaken assumption
+              3. a first move
+              4. the expected attribute or promised outcome
+            - If any item is still missing after revision, list it in missing_items
             """
         )
 
-        cleaned = re.sub(r"\*", "", reviewed).strip()
-        return cleaned or draft
+        cleaned = reviewed.replace("```json", "").replace("```", "").strip()
+        try:
+            parsed = json.loads(cleaned)
+            final_script = str(parsed.get("final_script", "")).strip() or draft
+            missing_items = parsed.get("missing_items", [])
+            if missing_items:
+                warning(
+                    "Script review missing items: "
+                    + ", ".join(str(item) for item in missing_items),
+                    False,
+                )
+            return re.sub(r"\*", "", final_script)
+        except Exception:
+            fallback = re.sub(r"\*", "", reviewed).strip()
+            warning(
+                "Script review did not return structured checks. Falling back to reviewed text.",
+                False,
+            )
+            return fallback or draft
 
     def review_metadata(self, draft_metadata: dict) -> dict:
         """
@@ -563,6 +658,8 @@ class YouTube:
             {self._variant_instruction()}
             Asset guidance:
             {self._asset_instruction()}
+            Demand diagnostics:
+            {self._demand_diagnostics_instruction()}
 
             Return valid JSON only with this schema:
             {{
@@ -574,6 +671,7 @@ class YouTube:
             - Specific, credible, no hype
             - Keep title under 90 characters
             - Keep description concise and CTA-aware
+            - Make the metadata preserve the strongest scene and expected outcome
             - Prefer owned asset capture over direct service selling
             """
         )
