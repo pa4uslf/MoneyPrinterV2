@@ -36,10 +36,13 @@ The following work is already represented in committed docs or repo changes:
 - a minimum distribution validation plan now exists in `docs/DistributionValidationPlan.md`
 - a first distribution execution kit now exists in `docs/DistributionExecutionKit.md`
 - a traffic strategy note now exists in `docs/FzhangTrafficStrategy.md`
+- a real-demand guidance layer now exists in `docs/real-demand/`
 
 Current gap summary:
 
 - measurement is not wired yet
+- repeated real-demand samples are still too thin
+- the primary ICP is still not narrow enough
 - topic scoring is not implemented yet
 - affiliate-safe comparison / recommendation clusters are not defined yet
 - welcome email, unsubscribe visibility, tagging, and low-frequency topic sends still need final verification
@@ -47,6 +50,18 @@ Current gap summary:
 - `shop.fzhang.dev` payment architecture is now decided in principle, but not yet implemented in code
 - `InsForge` is intentionally deferred unless the shop backend becomes a real bottleneck after payment integration
 - distribution validation has a plan, but still needs real channel actions and logged results
+
+Current operating judgment:
+
+- the direction is still considered viable
+- but it is not yet a proven MoneyPrinter loop
+- the repo is currently in a `direction right / evidence thin / legacy shell still present` state
+
+Reference for this judgment:
+
+- `docs/real-demand/2026-04-15-MoneyPrinter方向判断.md`
+- `docs/real-demand/真实需求识别与验证SOP.md`
+- `docs/real-demand/2026-04-15-90天推进路线图.md`
 
 ## North Star
 
@@ -72,6 +87,13 @@ The fork is drifting off course when outputs only support:
 - more outreach
 - more direct custom work
 - more manual selling with no asset accumulation
+
+Additional success criteria now apply:
+
+- repeated outside users in concrete deployment scenarios express similar pain
+- article -> checklist movement is observable
+- checklist unlocks lead to confirmed subscribers or deeper replies
+- a future SOP is pushed by repeated demand, not only by internal planning confidence
 
 ## Monetization Stack
 
@@ -112,6 +134,7 @@ This layer is allowed, but it should finance the earlier layers rather than domi
 ## Phase 2: Intent-Driven Content Engine
 
 - [x] Replace broad service-led prompts with monetizable-intent prompts
+- [ ] Narrow the primary ICP from broad "builders" to one main deployment-stage reader
 - [ ] Create content variants for:
 - [x] deployment intent
 - [x] risk / hardening intent
@@ -138,6 +161,7 @@ Execution note:
 - [ ] Add CTA variants that point to owned capture instead of direct call booking
 - [ ] Turn resource capture and subscription follow-up into a stable, low-overhead email path
 - [ ] Add measurement for capture conversion by topic type
+- [ ] Confirm whether checklist traffic reflects execution intent rather than passive saving behavior
 
 Implementation note:
 
@@ -153,6 +177,7 @@ Implementation note:
 - [x] Decide the payment architecture principle for `shop.fzhang.dev`
 - [ ] Define the first low-touch offer, only if needed as bootstrap revenue
 - [ ] Map which content types should lead to which monetization type
+- [ ] Require repeated outside demand signals before pushing the paid SOP harder
 
 Current working paid asset:
 
@@ -164,6 +189,11 @@ Current payment architecture rule:
 - do not use `Payoneer receiving account` as the primary checkout solution
 - current preferred direction is `Paddle` first, `Lemon Squeezy` second, `Stripe` later if deeper control becomes necessary
 - re-evaluate `InsForge` only after payment integration and first paid-asset traction make backend coordination the bottleneck
+
+Current gating rule:
+
+- do not let payment architecture work outrun demand validation for the SOP itself
+- `shop.fzhang.dev` remains downstream of proof, not upstream of proof
 
 ## Phase 6: Site Integration
 
@@ -190,6 +220,7 @@ Direction note:
 - [ ] product interest
 - [ ] optional service conversations
 - [ ] Maintain a topic ledger of outputs vs downstream value
+- [ ] Record real-demand samples, not only funnel metrics
 
 Execution note:
 
@@ -203,6 +234,19 @@ Execution note:
 - [ ] Execute the first 3 to 5 real distribution actions
 - [ ] Log channel-level results in `docs/distribution-log.csv`
 - [ ] Distinguish whether the current bottleneck is traffic, CTA click-through, or capture conversion
+- [ ] Distinguish which concrete user type and scenario each successful action is attracting
+
+## Demand Gates
+
+Before treating a topic, asset, or SOP path as validated, ask:
+
+1. Are repeated real users describing this problem in a concrete deployment or self-hosting moment?
+2. Can we name the current main ICP in one sentence?
+3. Are readers moving from article to checklist, not only consuming content passively?
+4. Are deeper replies or follow-up questions appearing?
+5. Is the push toward a paid SOP coming from repeated outside signals rather than internal excitement?
+
+If the answer to most of these is "no", the next step is more validation, not broader expansion.
 
 ## Decision Filters
 
@@ -237,12 +281,18 @@ If the answer to 1-3 is "no", it is probably off-strategy.
 - [x] Draft the first paid SOP body
 - [x] Update `origin` / `upstream` remotes so this fork can be pushed cleanly
 - [x] Add a dedicated upstream sync script for the fork workflow
+- [ ] Record at least 15 real-demand samples by `2026-05-14`
+- [ ] Execute and log at least 5 real distribution actions by `2026-05-14`
+- [ ] Decide the current main ICP for the deployment cluster by `2026-05-14`
+- [ ] Re-evaluate whether article 3 should move into regular rotation only after those samples exist
 
 ## Executable Shortlist
 
 1. Execute the first 3 to 5 real distribution actions for article 1 / article 2 and log them in `docs/distribution-log.csv`.
-2. Use the first real sample to distinguish whether the current bottleneck is traffic, article-to-checklist click-through, or checklist / confirmation conversion.
-3. Only after the first distribution sample exists, decide whether article 3 should move from bridge draft into regular distribution and SOP-intent testing.
+2. Use the first real sample to distinguish whether the current bottleneck is traffic, article-to-checklist click-through, checklist / confirmation conversion, or wrong ICP targeting.
+3. Collect enough user quotes and scenario notes to name the current main ICP and their highest-cost deployment moment.
+4. Only after the first distribution sample exists, decide whether article 3 should move from bridge draft into regular distribution and SOP-intent testing.
+5. Only after repeated outside demand signals exist, decide whether the paid SOP path or `shop.fzhang.dev` deserves more execution time.
 
 ## Portfolio Rule
 
