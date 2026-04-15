@@ -20,10 +20,17 @@ Recommended working title:
 
 ## Audience
 
-- independent developers
-- small teams
-- founders trying to self-host or deploy open-source tools
-- builders who picked a repo but are worried about setup mistakes
+Primary audience:
+
+- independent developers who can already self-host, but are afraid of launch mistakes
+- small-team technical owners who need a first-pass deployment judgment layer
+- builders who already picked a GitHub repo and now need to judge whether it is really worth deploying
+
+Not the primary audience for V1:
+
+- people who only want AI news or inspiration
+- users with no concrete project in hand
+- enterprise buyers looking for a full compliance or security program
 
 ## Problem It Solves
 
@@ -39,6 +46,12 @@ The checklist reduces random trial-and-error and helps readers feel:
 - more prepared
 - more systematic
 - more likely to succeed
+
+More precisely, the checklist should reduce three concrete costs:
+
+- wasted setup time on projects that were not worth deploying
+- avoidable launch mistakes caused by weak ordering and hidden exposure points
+- uncertainty about what must be handled now versus later
 
 ## Asset Format
 
@@ -87,9 +100,24 @@ Possible paid formats:
 
 Free checklist -> subscriber / downloader -> trust -> paid SOP or template -> optional affiliate / low-touch offer later
 
+## Real-Demand Test
+
+This asset should only be treated as the correct first asset if it keeps matching repeated outside signals.
+
+Signals to watch:
+
+- article readers click through to the checklist page
+- readers unlock or download the checklist
+- confirmed subscribers appear, not just raw form submits
+- readers ask for deeper help such as launch order, hardening priority, or a fuller SOP
+
+If those signals do not appear, the conclusion should not be "write more around the same assumption".
+The conclusion should be "re-check the user, scenario, and pain language".
+
 ## What To Avoid
 
 - do not make the free asset too broad
 - do not make it generic "AI productivity tips"
 - do not turn it into a sales brochure
 - do not require heavy customization to feel useful
+- do not describe the audience so broadly that the page stops feeling like it speaks to a real deployment moment

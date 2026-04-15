@@ -116,6 +116,33 @@ Ask:
 
 > How can this repo help me create one more durable income asset?
 
+## Demand Filter
+
+This repo now has an explicit real-demand gate.
+
+Reference:
+
+- `docs/real-demand/2026-04-15-MoneyPrinter方向判断.md`
+- `docs/real-demand/真实需求识别与验证SOP.md`
+- `docs/real-demand/2026-04-15-90天推进路线图.md`
+
+An idea is no longer strategically valid just because it:
+
+- sounds useful
+- fits Frank's strengths
+- can be turned into content quickly
+
+It also needs outside pull.
+
+Minimum signals:
+
+- repeated questions from real builders in concrete deployment or self-hosting scenarios
+- clicks from article to checklist or other owned assets
+- replies, follow-up questions, or explicit requests for a deeper version
+- evidence that readers are trying to move from understanding to execution
+
+Without these signals, the output may still be interesting content, but it should not be treated as a proven MoneyPrinter path.
+
 ## Suitable Monetization Types
 
 ### Strong fit
@@ -192,6 +219,20 @@ The audience can split into:
 - readers who later become service buyers
 
 This is healthier than forcing all traffic into direct selling.
+
+Current priority audience should also stay narrower than "all builders".
+
+Best-fit readers right now are:
+
+- independent developers who can already self-host but fear launch mistakes
+- small-team technical owners who need clearer launch order and risk boundaries
+- builders evaluating whether a GitHub project is worth deploying at all
+
+Lower-priority readers for the current phase:
+
+- generic AI-content readers
+- broad productivity audiences
+- enterprise buyers with heavy compliance needs
 
 ## Website Logic
 
