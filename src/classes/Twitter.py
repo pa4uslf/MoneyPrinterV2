@@ -34,6 +34,8 @@ class Twitter:
     Class for the Bot, that grows a Twitter account.
     """
 
+    _MAX_TWEET_LENGTH = 240
+
     def _variant_instruction(self) -> str:
         """
         Returns a specialized instruction block for the selected service variant.
@@ -91,6 +93,56 @@ class Twitter:
             "their strongest scene, what triggered the need now, what they fear will happen, "
             "which expected attribute must be delivered with certainty, what would only be a delighter, "
             "what could become a reverse attribute, and which stakeholder roles support or resist the next move."
+        )
+
+    def _tweet_mode_instruction(self) -> str:
+        """
+        Returns the smallest viable structure for an X post.
+
+        Returns:
+            instruction (str): Post-priority guidance
+        """
+        return (
+            "Treat this as a two-sentence X post. Priority order is fixed: "
+            "1) concrete scene, "
+            "2) mistaken instinct or blind spot, "
+            "3) first move, "
+            "4) identity cue only if it fits naturally, "
+            "5) CTA only if room remains. "
+            "Do not try to fully explain why the usual approach fails if space gets tight."
+        )
+
+    def _field_hauling_block(self) -> str:
+        """
+        Returns explicit instructions that forbid copying profile-field wording.
+
+        Returns:
+            instruction (str): Anti-field-hauling guidance
+        """
+        return (
+            "Do not copy profile fields verbatim into the post. "
+            "Never directly repeat labels or raw phrases such as "
+            "'desired identity', 'avoided identity', or 'expected attribute'. "
+            "Translate them into natural language only if they fit the post."
+        )
+
+    def _field_hauling_examples(self) -> str:
+        """
+        Returns profile values that should not be copied verbatim.
+
+        Returns:
+            examples (str): Compact text block
+        """
+        blocked_values = []
+        for key in ("desired_identity", "avoided_identity", "expected_attribute"):
+            value = str(self.content_profile.get(key, "") or "").strip()
+            if value:
+                blocked_values.append(f"{key}={value}")
+
+        return (
+            "Field-hauling examples to avoid: " + " | ".join(blocked_values)
+            if blocked_values
+            else "Field-hauling examples to avoid: none provided."
         )
 
     def __init__(
@@ -303,17 +355,24 @@ class Twitter:
                 {build_required_field_status(self.content_profile)}
                 Demand diagnostics:
                 {self._demand_diagnostics_instruction()}
+                Post mode:
+                {self._tweet_mode_instruction()}
+                Anti-field-hauling rule:
+                {self._field_hauling_block()}
+                {self._field_hauling_examples()}
 
                 Requirements:
-                - Maximum 240 characters
+                - Maximum {self._MAX_TWEET_LENGTH} characters
                 - Sound like a calm operator, not a hype marketer
-                - Start from one strong scene or moment of tension, not a generic thesis
-                - Mention one costly blind spot or mistaken assumption
-                - Give one practical next move or principle
+                - The post must start from one strong scene or moment of tension, not a generic thesis
+                - Include one mistaken instinct, blind spot, or bad default
+                - Include one first move
+                - If space is tight, keep scene + blind spot + first move and drop identity cue or CTA first
                 - Prefer deployment, security, workflow, cost, or implementation lessons
                 - Avoid generic inspiration, vague AI hot takes, and empty engagement bait
                 - Prioritize the expected attribute over decorative details
-                - If there is a CTA, point to a reusable asset, subscription, download, or owned destination before direct selling
+                - Identity cues are optional and must feel natural, not pasted from a profile
+                - CTA is optional and should only remain if there is room after the core structure
                 - Only return the post text
                 """
             )
@@ -373,6 +432,11 @@ class Twitter:
             {build_required_field_status(self.content_profile)}
             Demand diagnostics:
             {self._demand_diagnostics_instruction()}
+            Post mode:
+            {self._tweet_mode_instruction()}
+            Anti-field-hauling rule:
+            {self._field_hauling_block()}
+            {self._field_hauling_examples()}
 
             Return valid JSON only with this schema:
             {{
@@ -381,9 +445,11 @@ class Twitter:
                 "scene_present": true,
                 "blind_spot_present": true,
                 "first_move_present": true,
-                "expected_attribute_present": true
+                "expected_attribute_present": true,
+                "field_hauling_detected": false
               }},
-              "missing_items": ["scene", "blind_spot"]
+              "missing_items": ["scene", "blind_spot"],
+              "field_hauling_reasons": ["copied desired_identity wording"]
             }}
 
             Requirements:
@@ -391,15 +457,19 @@ class Twitter:
             - Remove hype, fluff, and generic AI phrasing
             - Make it sound specific, credible, useful, and scene-accurate
             - Preserve one concrete blind spot and one practical next move
+            - Prioritize this order: scene, blind spot, first move, natural identity cue, optional CTA
             - Avoid overemphasizing delighters or reverse attributes
             - Prefer owned-audience or reusable-asset direction over hard selling
-            - Keep it under 240 characters
+            - Keep it under {self._MAX_TWEET_LENGTH} characters
             - Explicitly check whether the post contains:
               1. a concrete scene
               2. a blind spot or mistaken assumption
               3. a first move
               4. the expected attribute or promised outcome
-            - If any item is still missing after revision, list it in missing_items
+            - Explicitly check whether the draft copies any raw field wording from desired_identity, avoided_identity, or expected_attribute
+            - If the draft still lacks scene, blind spot, or first move, mark it as missing
+            - If field hauling is detected, mark it and rewrite to remove it
+            - If space is tight, preserve scene + blind spot + first move first
             """
         )
 
@@ -410,9 +480,18 @@ class Twitter:
                 str(parsed.get("final_post", "")).replace('"', "").strip() or draft
             )
             missing_items = parsed.get("missing_items", [])
+            checks = parsed.get("checks", {}) or {}
+            field_hauling_detected = bool(checks.get("field_hauling_detected", False))
+            field_hauling_reasons = parsed.get("field_hauling_reasons", []) or []
             if missing_items:
                 warning(
                     "X review missing items: " + ", ".join(str(item) for item in missing_items),
+                    False,
+                )
+            if field_hauling_detected:
+                warning(
+                    "X review detected field hauling: "
+                    + ", ".join(str(item) for item in field_hauling_reasons),
                     False,
                 )
             return re.sub(r"\*", "", final_post)
