@@ -35,6 +35,66 @@ class Twitter:
     """
 
     _MAX_TWEET_LENGTH = 240
+    _VALID_FIRST_MOVE_PREFIXES = (
+        "check",
+        "verify",
+        "inspect",
+        "list",
+        "compare",
+        "disable",
+        "trace",
+        "review",
+    )
+    _FIRST_MOVE_ACTION_KEYWORDS = (
+        "route",
+        "routes",
+        "path",
+        "paths",
+        "auth",
+        "proxy",
+        "reverse proxy",
+        "nginx",
+        "config",
+        "configuration",
+        "port",
+        "ports",
+        "secret",
+        "secrets",
+        "env",
+        "environment",
+        "header",
+        "headers",
+        "admin",
+        "public",
+        "permission",
+        "permissions",
+    )
+    _CTA_SHADOW_MARKERS = (
+        "use our checklist",
+        "use this checklist",
+        "download",
+        "learn more",
+        "read the guide",
+        "use this guide",
+        "follow our framework",
+        "follow this checklist",
+        "use this template",
+        "grab the template",
+        "see the full list",
+        "checklist",
+        "template",
+        "guide",
+        "framework",
+        "http://",
+        "https://",
+        "www.",
+    )
+    _EXPECTED_ATTRIBUTE_SHADOWS = (
+        "clear first-pass deploy judgment",
+        "no obvious exposure",
+        "avoid deployment mistakes",
+        "safer first release",
+    )
 
     def _variant_instruction(self) -> str:
         """
@@ -144,6 +204,352 @@ class Twitter:
             if blocked_values
             else "Field-hauling examples to avoid: none provided."
         )
+
+    def _cta_heuristic_present(self, text: str) -> bool:
+        """
+        Detects whether the post still contains a likely CTA.
+
+        Args:
+            text (str): Post text
+
+        Returns:
+            present (bool): True when CTA-like phrasing remains
+        """
+        lowered = str(text or "").lower()
+        cta_markers = [
+            "download",
+            "subscribe",
+            "learn more",
+            "read more",
+            "get the checklist",
+            "grab the checklist",
+            "checklist",
+            "http://",
+            "https://",
+            "www.",
+        ]
+        return any(marker in lowered for marker in cta_markers)
+
+    def _normalize_short_text(self, text: str) -> str:
+        """
+        Normalizes short text for hard checks.
+
+        Args:
+            text (str): Raw text
+
+        Returns:
+            normalized (str): Lowercased compact text
+        """
+        lowered = str(text or "").lower().strip()
+        lowered = re.sub(r"[^a-z0-9\\s:/.-]", " ", lowered)
+        return re.sub(r"\\s+", " ", lowered).strip()
+
+    def _contains_cta_shadow(self, text: str) -> bool:
+        """
+        Detects CTA-shadow phrasing.
+
+        Args:
+            text (str): Candidate text
+
+        Returns:
+            present (bool): True when CTA-shadow phrasing exists
+        """
+        normalized = self._normalize_short_text(text)
+        return any(marker in normalized for marker in self._CTA_SHADOW_MARKERS)
+
+    def _contains_expected_attribute_leak(self, text: str) -> bool:
+        """
+        Detects exact or near-exact expected-attribute leakage.
+
+        Args:
+            text (str): Candidate text
+
+        Returns:
+            leaked (bool): True when result-style leakage exists
+        """
+        normalized = self._normalize_short_text(text)
+
+        if any(marker in normalized for marker in self._EXPECTED_ATTRIBUTE_SHADOWS):
+            return True
+
+        expected_attribute = self._normalize_short_text(
+            self.content_profile.get("expected_attribute", "")
+        )
+        if not expected_attribute:
+            return False
+
+        tokens = expected_attribute.split()
+        if len(tokens) >= 3:
+            ngrams = [" ".join(tokens[idx : idx + 3]) for idx in range(len(tokens) - 2)]
+            if any(ngram in normalized for ngram in ngrams):
+                return True
+
+        return False
+
+    def _is_valid_first_move(self, text: str) -> bool:
+        """
+        Validates that first_move is an internal deployment/config action.
+
+        Args:
+            text (str): Candidate first move
+
+        Returns:
+            valid (bool): True when valid
+        """
+        normalized = self._normalize_short_text(text)
+        if not normalized:
+            return False
+        if self._contains_cta_shadow(normalized):
+            return False
+        if self._contains_expected_attribute_leak(normalized):
+            return False
+        if not normalized.startswith(self._VALID_FIRST_MOVE_PREFIXES):
+            return False
+        return any(keyword in normalized for keyword in self._FIRST_MOVE_ACTION_KEYWORDS)
+
+    def _generate_tweet_slots(self) -> dict:
+        """
+        Generates structured slots for final tweet rendering.
+
+        Returns:
+            slots (dict): Slot payload
+        """
+        completion = generate_text(
+            f"""
+            Generate slot JSON for a short technical X post.
+
+            Topic / angle: {self.topic}
+            {build_profile_context(self.content_profile)}
+            Reusable case brief:
+            {self.case_brief or "None"}
+            Variant guidance:
+            {self._variant_instruction()}
+            Asset guidance:
+            {self._asset_instruction()}
+            Required field status:
+            {build_required_field_status(self.content_profile)}
+
+            Return valid JSON only with this schema:
+            {{
+              "scene": "short concrete moment before a real decision or exposure",
+              "bad_instinct": "bad instinct, dangerous default, or common misjudgment",
+              "first_move": "immediate action step",
+              "optional_identity_cue": "",
+              "optional_cta": ""
+            }}
+
+            Requirements:
+            - scene must be concrete
+            - bad_instinct must read like a bad instinct, dangerous default, or common misjudgment
+            - first_move must start with one of: check, verify, inspect, list, compare, disable, trace, review
+            - first_move must point to a deployment/config/product-internal action
+            - first_move must not be a checklist, guide, template, or download action
+            - optional_cta should default to empty
+            - do not copy raw desired_identity, avoided_identity, or expected_attribute wording
+            """
+        )
+
+        cleaned = completion.replace("```json", "").replace("```", "").strip()
+        return json.loads(cleaned)
+
+    def _validate_tweet_slots(self, slots: dict) -> dict:
+        """
+        Validates slots against hard Twitter constraints.
+
+        Args:
+            slots (dict): Slot payload
+
+        Returns:
+            result (dict): Validation result
+        """
+        scene = str(slots.get("scene", "") or "").strip()
+        bad_instinct = str(slots.get("bad_instinct", "") or "").strip()
+        first_move = str(slots.get("first_move", "") or "").strip()
+        optional_cta = str(slots.get("optional_cta", "") or "").strip()
+
+        bad_instinct_normalized = self._normalize_short_text(bad_instinct)
+        bad_instinct_valid = bool(bad_instinct) and (
+            "bad instinct" in bad_instinct_normalized
+            or "dangerous default" in bad_instinct_normalized
+            or "assume" in bad_instinct_normalized
+            or "trust localhost" in bad_instinct_normalized
+            or "default" in bad_instinct_normalized
+        )
+
+        return {
+            "scene": scene,
+            "bad_instinct": bad_instinct,
+            "first_move": first_move,
+            "optional_cta": optional_cta,
+            "scene_valid": bool(scene),
+            "bad_instinct_valid": bad_instinct_valid,
+            "first_move_valid": self._is_valid_first_move(first_move),
+            "cta_shadow": self._contains_cta_shadow(optional_cta)
+            or self._contains_cta_shadow(first_move),
+            "expected_attribute_leak": self._contains_expected_attribute_leak(scene)
+            or self._contains_expected_attribute_leak(bad_instinct)
+            or self._contains_expected_attribute_leak(first_move),
+        }
+
+    def _sanitize_tweet_render(self, text: str) -> str:
+        """
+        Removes CTA shadows and expected-attribute leakage from final text.
+
+        Args:
+            text (str): Tweet draft
+
+        Returns:
+            cleaned (str): Sanitized tweet
+        """
+        cleaned = str(text or "").strip()
+        patterns = [
+            r"\\bclear first-pass deploy judgment\\b",
+            r"\\bno obvious exposure\\b",
+            r"\\bavoid deployment mistakes\\b",
+            r"\\bsafer first release\\b",
+            r"\\bdownload(?: now)?\\b.*",
+            r"\\buse our checklist\\b.*",
+            r"\\buse this checklist\\b.*",
+        ]
+        for pattern in patterns:
+            cleaned = re.sub(pattern, "", cleaned, flags=re.IGNORECASE)
+
+        cleaned = re.sub(r"\\s+", " ", cleaned).strip(" .,:;-")
+        return cleaned
+
+    def _render_tweet_from_slots(self, scene: str, bad_instinct: str, first_move: str) -> str:
+        """
+        Renders final tweet from core slots only.
+
+        Args:
+            scene (str): Concrete scene
+            bad_instinct (str): Mistaken instinct
+            first_move (str): Immediate action
+
+        Returns:
+            tweet (str): Final tweet
+        """
+        parts = []
+        if scene:
+            parts.append(scene.strip())
+        if bad_instinct:
+            parts.append(bad_instinct.strip())
+        if first_move:
+            parts.append(first_move.strip())
+
+        tweet = ". ".join(part.rstrip(". ") for part in parts if part).strip()
+        tweet = self._sanitize_tweet_render(tweet)
+        if len(tweet) > self._MAX_TWEET_LENGTH:
+            tweet = tweet[: self._MAX_TWEET_LENGTH].rsplit(" ", 1)[0].rstrip(" .,:;-")
+        return tweet
+
+    def _review_json_prompt(self, draft: str) -> str:
+        """
+        Builds the structured review prompt for X posts.
+
+        Args:
+            draft (str): Draft post text
+
+        Returns:
+            prompt (str): Review prompt
+        """
+        return f"""
+            Review and improve this X post for a technical reusable-business-asset operator.
+
+            Draft:
+            {draft}
+
+            Context:
+            Topic / angle: {self.topic}
+            {build_profile_context(self.content_profile)}
+            Reusable case brief:
+            {self.case_brief or "None"}
+            Variant guidance:
+            {self._variant_instruction()}
+            Asset guidance:
+            {self._asset_instruction()}
+            Required field status:
+            {build_required_field_status(self.content_profile)}
+            Demand diagnostics:
+            {self._demand_diagnostics_instruction()}
+            Post mode:
+            {self._tweet_mode_instruction()}
+            Anti-field-hauling rule:
+            {self._field_hauling_block()}
+            {self._field_hauling_examples()}
+
+            Return valid JSON only with this schema:
+            {{
+              "scene": "short scene phrase",
+              "bad_instinct": "mistaken instinct or dangerous default",
+              "first_move": "immediate action step",
+              "identity_cue": "optional natural identity cue",
+              "cta": "optional CTA",
+              "final_post": "revised post",
+              "checks": {{
+                "scene_present": true,
+                "blind_spot_present": true,
+                "first_move_present": true,
+                "expected_attribute_present": true,
+                "cta_present": false,
+                "cta_allowed": false,
+                "field_hauling_detected": false
+              }},
+              "missing_items": ["blind_spot", "first_move"],
+              "field_hauling_reasons": ["copied desired_identity wording"]
+            }}
+
+            Requirements:
+            - Keep the core meaning
+            - Remove hype, fluff, and generic AI phrasing
+            - Preserve this strict priority order:
+              1. scene
+              2. mistaken instinct / blind spot
+              3. first move
+              4. natural identity cue only if room remains
+              5. CTA only if all core elements survive
+            - The blind spot must read like a bad instinct, dangerous default, or common misjudgment
+            - The first move must be an immediate action, not a slogan, attitude, or download CTA
+            - If space is tight, delete the CTA first, then identity cue
+            - Never sacrifice blind spot or first move to keep a CTA
+            - Explicitly check whether the post contains:
+              1. a concrete scene
+              2. a mistaken instinct / blind spot
+              3. a first move
+              4. the expected attribute or promised outcome
+              5. any CTA
+            - Explicitly check whether the draft copies any raw field wording from desired_identity, avoided_identity, or expected_attribute
+            - CTA is allowed only when:
+              scene_present = true
+              blind_spot_present = true
+              first_move_present = true
+            - If CTA appears while blind_spot_present = false or first_move_present = false, set cta_allowed = false and rewrite without CTA
+            - Keep the final post under {self._MAX_TWEET_LENGTH} characters
+        """
+
+    def _parse_review_result(self, reviewed: str, draft: str) -> tuple[str, dict, list[str], list[str]]:
+        """
+        Parses structured review output.
+
+        Args:
+            reviewed (str): Raw model response
+            draft (str): Fallback draft
+
+        Returns:
+            final_post (str): Final reviewed post
+            checks (dict): Structured checks
+            missing_items (list[str]): Missing item list
+            field_hauling_reasons (list[str]): Field hauling issues
+        """
+        cleaned = reviewed.replace("```json", "").replace("```", "").strip()
+        parsed = json.loads(cleaned)
+        final_post = str(parsed.get("final_post", "")).replace('"', "").strip() or draft
+        checks = parsed.get("checks", {}) or {}
+        missing_items = [str(item) for item in (parsed.get("missing_items", []) or [])]
+        field_hauling_reasons = [
+            str(item) for item in (parsed.get("field_hauling_reasons", []) or [])
+        ]
+        return re.sub(r"\*", "", final_post), checks, missing_items, field_hauling_reasons
 
     def __init__(
         self,
@@ -339,43 +745,27 @@ class Twitter:
                     + ". Falling back to explicit downgrade logic.",
                     False,
                 )
-            completion = generate_text(
-                f"""
-                Write a concise X post in {get_twitter_language()} for a technical content and audience-building business.
+            validation = None
+            for _attempt in range(3):
+                slots = self._generate_tweet_slots()
+                validation = self._validate_tweet_slots(slots)
+                if (
+                    validation["scene_valid"]
+                    and validation["bad_instinct_valid"]
+                    and validation["first_move_valid"]
+                    and not validation["cta_shadow"]
+                    and not validation["expected_attribute_leak"]
+                ):
+                    break
 
-                Topic / angle: {self.topic}
-                {build_profile_context(self.content_profile)}
-                Reusable case brief:
-                {self.case_brief or "None"}
-                Variant guidance:
-                {self._variant_instruction()}
-                Asset guidance:
-                {self._asset_instruction()}
-                Required field status:
-                {build_required_field_status(self.content_profile)}
-                Demand diagnostics:
-                {self._demand_diagnostics_instruction()}
-                Post mode:
-                {self._tweet_mode_instruction()}
-                Anti-field-hauling rule:
-                {self._field_hauling_block()}
-                {self._field_hauling_examples()}
-
-                Requirements:
-                - Maximum {self._MAX_TWEET_LENGTH} characters
-                - Sound like a calm operator, not a hype marketer
-                - The post must start from one strong scene or moment of tension, not a generic thesis
-                - Include one mistaken instinct, blind spot, or bad default
-                - Include one first move
-                - If space is tight, keep scene + blind spot + first move and drop identity cue or CTA first
-                - Prefer deployment, security, workflow, cost, or implementation lessons
-                - Avoid generic inspiration, vague AI hot takes, and empty engagement bait
-                - Prioritize the expected attribute over decorative details
-                - Identity cues are optional and must feel natural, not pasted from a profile
-                - CTA is optional and should only remain if there is room after the core structure
-                - Only return the post text
-                """
-            )
+            if validation is None:
+                completion = ""
+            else:
+                completion = self._render_tweet_from_slots(
+                    validation["scene"],
+                    validation["bad_instinct"],
+                    validation["first_move"],
+                )
         else:
             completion = generate_text(
                 f"Generate a Twitter post about: {self.topic} in {get_twitter_language()}. "
@@ -412,77 +802,16 @@ class Twitter:
         Returns:
             post (str): Reviewed post
         """
-        reviewed = generate_text(
-            f"""
-            Review and improve this X post for a technical reusable-business-asset operator.
-
-            Draft:
-            {draft}
-
-            Context:
-            Topic / angle: {self.topic}
-            {build_profile_context(self.content_profile)}
-            Reusable case brief:
-            {self.case_brief or "None"}
-            Variant guidance:
-            {self._variant_instruction()}
-            Asset guidance:
-            {self._asset_instruction()}
-            Required field status:
-            {build_required_field_status(self.content_profile)}
-            Demand diagnostics:
-            {self._demand_diagnostics_instruction()}
-            Post mode:
-            {self._tweet_mode_instruction()}
-            Anti-field-hauling rule:
-            {self._field_hauling_block()}
-            {self._field_hauling_examples()}
-
-            Return valid JSON only with this schema:
-            {{
-              "final_post": "revised post",
-              "checks": {{
-                "scene_present": true,
-                "blind_spot_present": true,
-                "first_move_present": true,
-                "expected_attribute_present": true,
-                "field_hauling_detected": false
-              }},
-              "missing_items": ["scene", "blind_spot"],
-              "field_hauling_reasons": ["copied desired_identity wording"]
-            }}
-
-            Requirements:
-            - Keep the core meaning
-            - Remove hype, fluff, and generic AI phrasing
-            - Make it sound specific, credible, useful, and scene-accurate
-            - Preserve one concrete blind spot and one practical next move
-            - Prioritize this order: scene, blind spot, first move, natural identity cue, optional CTA
-            - Avoid overemphasizing delighters or reverse attributes
-            - Prefer owned-audience or reusable-asset direction over hard selling
-            - Keep it under {self._MAX_TWEET_LENGTH} characters
-            - Explicitly check whether the post contains:
-              1. a concrete scene
-              2. a blind spot or mistaken assumption
-              3. a first move
-              4. the expected attribute or promised outcome
-            - Explicitly check whether the draft copies any raw field wording from desired_identity, avoided_identity, or expected_attribute
-            - If the draft still lacks scene, blind spot, or first move, mark it as missing
-            - If field hauling is detected, mark it and rewrite to remove it
-            - If space is tight, preserve scene + blind spot + first move first
-            """
-        )
-
-        cleaned = reviewed.replace("```json", "").replace("```", "").strip()
+        reviewed = generate_text(self._review_json_prompt(draft))
         try:
-            parsed = json.loads(cleaned)
-            final_post = (
-                str(parsed.get("final_post", "")).replace('"', "").strip() or draft
+            final_post, checks, missing_items, field_hauling_reasons = self._parse_review_result(
+                reviewed, draft
             )
-            missing_items = parsed.get("missing_items", [])
-            checks = parsed.get("checks", {}) or {}
+            blind_spot_present = bool(checks.get("blind_spot_present", False))
+            first_move_present = bool(checks.get("first_move_present", False))
+            cta_present = bool(checks.get("cta_present", False)) or self._cta_heuristic_present(final_post)
+            cta_allowed = bool(checks.get("cta_allowed", False))
             field_hauling_detected = bool(checks.get("field_hauling_detected", False))
-            field_hauling_reasons = parsed.get("field_hauling_reasons", []) or []
             if missing_items:
                 warning(
                     "X review missing items: " + ", ".join(str(item) for item in missing_items),
@@ -494,11 +823,38 @@ class Twitter:
                     + ", ".join(str(item) for item in field_hauling_reasons),
                     False,
                 )
-            return re.sub(r"\*", "", final_post)
+            if cta_present and (not blind_spot_present or not first_move_present or not cta_allowed):
+                warning(
+                    "X review rejected CTA because it displaced blind_spot or first_move. Rewriting without CTA.",
+                    False,
+                )
+                second_pass = generate_text(
+                    self._review_json_prompt(
+                        draft
+                        + "\n\nRewrite rule: remove the CTA entirely and keep only scene + blind spot + first move."
+                    )
+                )
+                second_post, _, second_missing, second_field_hauling = self._parse_review_result(
+                    second_pass, final_post
+                )
+                if second_missing:
+                    warning(
+                        "X second-pass review missing items: "
+                        + ", ".join(str(item) for item in second_missing),
+                        False,
+                    )
+                if second_field_hauling:
+                    warning(
+                        "X second-pass field hauling: "
+                        + ", ".join(str(item) for item in second_field_hauling),
+                        False,
+                    )
+                return self._sanitize_tweet_render(second_post)
+            return self._sanitize_tweet_render(final_post)
         except Exception:
             cleaned_post = re.sub(r"\*", "", reviewed).replace('"', "").strip()
             warning(
                 "X review did not return structured checks. Falling back to reviewed text.",
                 False,
             )
-            return cleaned_post or draft
+            return self._sanitize_tweet_render(cleaned_post or draft)
