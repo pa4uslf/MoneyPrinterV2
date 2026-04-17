@@ -65,6 +65,10 @@
 - `python3 src/main.py`: start the CLI app.
 - `bash scripts/upload_video.sh`: run direct script-based upload flow from repo root.
 
+## Shell Command Handling
+- Do not require `rtk` for shell commands in this repo.
+- Use normal shell commands by default unless the user explicitly asks to use `rtk` or another wrapper.
+
 ## Coding Style & Naming Conventions
 - Target Python 3.12 (project requirement in `README.md`).
 - Use 4-space indentation and follow existing Python conventions:
