@@ -24,6 +24,11 @@
 
 - `2026-04-15-90天推进路线图.md`
 
+如果你要开始真正记证据，不要只看模板，直接打开：
+
+- `demand-evidence-samples.csv`
+- `substitute-solution-map.csv`
+
 如果你开始担心“这个方向是不是 AI 基于已有内容二次推出来的假设”“用户是不是已经被 README / issue / AI 充分满足”，继续读：
 
 - `2026-04-20-方向归零验证方案.md`
@@ -77,6 +82,20 @@
 - 流量策略：`docs/FzhangTrafficStrategy.md`
 
 新目录的作用，是给这些文档加一个“真需求过滤器”。
+
+## 模板与工作台
+
+保留为模板的：
+
+- `需求证据样本模板.md`
+- `替代方案地图模板.md`
+- `用户访谈模板.md`
+- `AI对照实验模板.md`
+
+已经落成实际工作台的：
+
+- `demand-evidence-samples.csv`
+- `substitute-solution-map.csv`
 
 补充说明：
 
