@@ -251,6 +251,42 @@ For the current checklist loop, track this path:
 
 This is enough to make better decisions even before a full analytics stack exists.
 
+## Companion Demand Evidence Log
+
+`topic-ledger.csv` 负责记录主题和漏斗表现。
+
+但当前阶段还需要一份配套的“需求证据层”记录，至少能回答：
+
+- 用户现在靠什么解决
+- 是否已经在用 AI
+- AI / README / forum / consultant 哪里不够
+- 用户更像想买数字资产，还是更像想要项目级判断
+
+最低建议字段：
+
+- `sample_date`
+- `channel`
+- `source_url_or_person`
+- `user_quote`
+- `scenario`
+- `current_blocker`
+- `feared_outcome`
+- `current_workaround`
+- `current_ai_tools_used`
+- `current_ai_limitations`
+- `requested_next_step`
+- `willing_to_pay_or_book`
+- `matched_asset`
+- `notes`
+
+这份记录不要求一开始就放进 repo。
+
+当前阶段允许：
+
+- 先放在知识库
+- 先放在人工笔记
+- 再把提炼后的重复结论回写到 repo 文档和 ledger 的 `proof_summary` / `next_iteration`
+
 ## Collection Method
 
 ### Phase 1: Manual Or Semi-Manual Is Acceptable
@@ -264,6 +300,8 @@ Acceptable phase-1 sources:
 - Buttondown confirmed subscriber counts by tag
 - inbox replies
 - manual notes from real conversations
+- manual notes from substitute-solution research
+- interview notes that mention AI usage and AI limitations
 
 ### Phase 2: Add Better Event Tracking Later
 

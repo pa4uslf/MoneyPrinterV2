@@ -43,6 +43,7 @@ Current gap summary:
 - measurement is not wired yet
 - repeated real-demand samples are still too thin
 - the primary ICP is still not narrow enough
+- the current direction still lacks a proper "reset validation" pass against substitute solutions, especially general-purpose AI
 - topic scoring is not implemented yet
 - affiliate-safe comparison / recommendation clusters are not defined yet
 - welcome email, unsubscribe visibility, tagging, and low-frequency topic sends still need final verification
@@ -91,9 +92,11 @@ The fork is drifting off course when outputs only support:
 Additional success criteria now apply:
 
 - repeated outside users in concrete deployment scenarios express similar pain
+- repeated users describe where README / issue / AI are still not enough
 - article -> checklist movement is observable
 - checklist unlocks lead to confirmed subscribers or deeper replies
 - a future SOP is pushed by repeated demand, not only by internal planning confidence
+- the project can explain whether its value is a standalone digital asset, a project-level judgment product, or a module inside a broader service
 
 ## Monetization Stack
 
@@ -135,6 +138,7 @@ This layer is allowed, but it should finance the earlier layers rather than domi
 
 - [x] Replace broad service-led prompts with monetizable-intent prompts
 - [ ] Narrow the primary ICP from broad "builders" to one main deployment-stage reader
+- [ ] Build a substitute-solution map that includes README/docs, forums, consultants, managed services, and general-purpose AI
 - [ ] Create content variants for:
 - [x] deployment intent
 - [x] risk / hardening intent
@@ -162,6 +166,7 @@ Execution note:
 - [ ] Turn resource capture and subscription follow-up into a stable, low-overhead email path
 - [ ] Add measurement for capture conversion by topic type
 - [ ] Confirm whether checklist traffic reflects execution intent rather than passive saving behavior
+- [ ] Confirm whether checklist visitors were previously relying on AI, README, or community answers, and where those alternatives felt insufficient
 
 Implementation note:
 
@@ -175,6 +180,7 @@ Implementation note:
 - [ ] Define the first affiliate-safe topic cluster
 - [x] Define the first paid digital asset to test
 - [x] Decide the payment architecture principle for `shop.fzhang.dev`
+- [ ] Test whether the strongest paid form is a standalone SOP, a project-level deployment judgment offer, or a broader guided service
 - [ ] Define the first low-touch offer, only if needed as bootstrap revenue
 - [ ] Map which content types should lead to which monetization type
 - [ ] Require repeated outside demand signals before pushing the paid SOP harder
@@ -221,6 +227,7 @@ Direction note:
 - [ ] optional service conversations
 - [ ] Maintain a topic ledger of outputs vs downstream value
 - [ ] Record real-demand samples, not only funnel metrics
+- [ ] Add evidence fields for current workaround, AI tools used, AI limitations, and willingness to continue toward paid help
 
 Execution note:
 
@@ -235,6 +242,7 @@ Execution note:
 - [ ] Log channel-level results in `docs/distribution-log.csv`
 - [ ] Distinguish whether the current bottleneck is traffic, CTA click-through, or capture conversion
 - [ ] Distinguish which concrete user type and scenario each successful action is attracting
+- [ ] Run a direction-reset validation pass: 100 problem samples, 10-15 user interviews, 10-20 AI-vs-us comparisons, and 5-10 concierge judgments
 
 ## Demand Gates
 
@@ -245,6 +253,7 @@ Before treating a topic, asset, or SOP path as validated, ask:
 3. Are readers moving from article to checklist, not only consuming content passively?
 4. Are deeper replies or follow-up questions appearing?
 5. Is the push toward a paid SOP coming from repeated outside signals rather than internal excitement?
+6. When users already have README / issue / AI, do they still want a stronger judgment layer?
 
 If the answer to most of these is "no", the next step is more validation, not broader expansion.
 

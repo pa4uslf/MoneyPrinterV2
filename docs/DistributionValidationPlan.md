@@ -45,6 +45,7 @@
 补充一个同等重要的目标：
 
 5. 这些真实问题，究竟是谁在什么场景下表达出来的？
+6. 这些人当前最常依赖的替代方案是什么，尤其是通用 AI 是否已经足够满足他们？
 
 如果只有点击、没有真实问题样本，这轮验证仍然是不完整的。
 
@@ -70,8 +71,11 @@
 - `current_blocker`
 - `feared_outcome`
 - `current_workaround`
+- `current_ai_tools_used`
+- `current_ai_limitations`
 - `requested_next_step`
 - `matched_asset`
+- `willing_to_pay_or_book`
 - `notes`
 
 这里的目标不是建立重型 CRM。
@@ -85,6 +89,12 @@
 - 到底是谁觉得它有效
 - 为什么有效
 - 有效在漏斗前段，还是有效在更深需求暴露
+
+补充说明：
+
+- `current_workaround` 不只指 README / issue / 博客
+- 还包括用户是否已经在用 ChatGPT / Claude / Gemini / Perplexity 之类的通用 AI
+- 如果对方已经用过 AI，要尽量记录 AI 帮到了哪一步、又卡在了哪一步
 
 ## 本轮验证资产
 
@@ -208,6 +218,7 @@
 - 具体位置：仓库 / issue / discussion URL
 - 内容类型：文章 or checklist
 - 尽量摘一句对方原话，标记他卡在 `值不值得部署 / 环境差异 / 暴露风险 / 顺序不清` 里的哪一类
+- 尽量判断对方是否已经先问过 AI，或者是否明显还在把 README / issue / AI 拼在一起用
 
 ### 2. 个人知识网络 / 现有收藏渠道
 
