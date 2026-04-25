@@ -9,6 +9,8 @@
   "nanobanana2_api_key": "",
   "nanobanana2_model": "gemini-3.1-flash-image-preview",
   "nanobanana2_aspect_ratio": "9:16",
+  "image_provider": "nanobanana2",
+  "automatic1111_base_url": "http://127.0.0.1:7860",
   "threads": 2,
   "zip_url": "",
   "is_for_kids": false,

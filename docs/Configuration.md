@@ -14,6 +14,8 @@ All your configurations will be in a file in the root directory, called `config.
 - `nanobanana2_api_key`: `string` - API key for Nano Banana 2 (Gemini image API). If empty, MPV2 falls back to environment variable `GEMINI_API_KEY`.
 - `nanobanana2_model`: `string` - Nano Banana 2 model name (default: `gemini-3.1-flash-image-preview`).
 - `nanobanana2_aspect_ratio`: `string` - Aspect ratio for generated images (default: `9:16`).
+- `image_provider`: `string` - Image provider to check during local preflight. Current full YouTube image generation still uses `nanobanana2`; `local_automatic1111` is checked for local readiness but does not yet replace the YouTube image backend.
+- `automatic1111_base_url`: `string` - Base URL for a local Automatic1111 server when `image_provider` is `local_automatic1111` (default: `http://127.0.0.1:7860`).
 - `threads`: `number` - The amount of threads that will be used to execute operations, e.g. writing to a file using MoviePy.
 - `is_for_kids`: `boolean` - If `true`, the application will upload the video to YouTube Shorts as a video for kids.
 - `google_maps_scraper`: `string` - The URL to the Google Maps scraper. This will be used to scrape Google Maps for local businesses. It is recommended to use the default value.
@@ -52,11 +54,12 @@ Text generation uses the LM Studio local server through its OpenAI-compatible `/
 Before running MPV2, start the server and load a model:
 
 ```bash
+lms daemon up
 lms server start
 lms load <model>
 ```
 
-Then either set `lms_model` in `config.json`, or leave it empty and pick from the available LM Studio models when the app starts.
+Load a text generation model, not only an embedding model. Then either set `lms_model` in `config.json`, or leave it empty and pick from the available LM Studio models when the app starts.
 
 ## Example
 
@@ -72,6 +75,8 @@ Then either set `lms_model` in `config.json`, or leave it empty and pick from th
   "nanobanana2_api_key": "",
   "nanobanana2_model": "gemini-3.1-flash-image-preview",
   "nanobanana2_aspect_ratio": "9:16",
+  "image_provider": "nanobanana2",
+  "automatic1111_base_url": "http://127.0.0.1:7860",
   "threads": 2,
   "zip_url": "",
   "is_for_kids": false,
