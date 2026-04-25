@@ -16,14 +16,6 @@ fake_kittentts = types.ModuleType("kittentts")
 fake_kittentts.KittenTTS = object
 sys.modules.setdefault("kittentts", fake_kittentts)
 
-fake_ollama = types.ModuleType("ollama")
-fake_ollama.Client = object
-sys.modules.setdefault("ollama", fake_ollama)
-
-fake_llm_provider = types.ModuleType("llm_provider")
-fake_llm_provider.select_model = lambda model: None
-sys.modules.setdefault("llm_provider", fake_llm_provider)
-
 fake_tts_module = types.ModuleType("classes.Tts")
 fake_tts_module.TTS = object
 sys.modules.setdefault("classes.Tts", fake_tts_module)

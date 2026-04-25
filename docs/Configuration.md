@@ -7,8 +7,8 @@ All your configurations will be in a file in the root directory, called `config.
 - `verbose`: `boolean` - If `true`, the application will print out more information.
 - `firefox_profile`: `string` - The path to your Firefox profile. This is used to use your Social Media Accounts without having to log in every time you run the application.
 - `headless`: `boolean` - If `true`, the application will run in headless mode. This means that the browser will not be visible.
-- `ollama_base_url`: `string` - Base URL of your local Ollama server (default: `http://127.0.0.1:11434`).
-- `ollama_model`: `string` - Ollama model to use for text generation (e.g. `llama3.2:3b`). If empty, the app queries Ollama at startup and lets you pick from the available models interactively.
+- `lms_base_url`: `string` - Base URL of your local LM Studio OpenAI-compatible server (default: `http://127.0.0.1:1234/v1`).
+- `lms_model`: `string` - LM Studio model to use for text generation. If empty, the app queries the LM Studio server at startup and lets you pick from the available models interactively.
 - `twitter_language`: `string` - The language that will be used to generate & post tweets.
 - `nanobanana2_api_base_url`: `string` - Nano Banana 2 API base URL (default: `https://generativelanguage.googleapis.com/v1beta`).
 - `nanobanana2_api_key`: `string` - API key for Nano Banana 2 (Gemini image API). If empty, MPV2 falls back to environment variable `GEMINI_API_KEY`.
@@ -45,6 +45,19 @@ All your configurations will be in a file in the root directory, called `config.
     - `account_ids`: `number[]` - Optional fixed Post Bridge account IDs to avoid account-selection prompts.
     - `auto_crosspost`: `boolean` - If `true`, cross-post automatically after a successful YouTube upload. If `false`, interactive runs ask and cron runs skip.
 
+## Local LLM Runtime
+
+Text generation uses the LM Studio local server through its OpenAI-compatible `/v1` API.
+
+Before running MPV2, start the server and load a model:
+
+```bash
+lms server start
+lms load <model>
+```
+
+Then either set `lms_model` in `config.json`, or leave it empty and pick from the available LM Studio models when the app starts.
+
 ## Example
 
 ```json
@@ -52,8 +65,8 @@ All your configurations will be in a file in the root directory, called `config.
   "verbose": true,
   "firefox_profile": "",
   "headless": false,
-  "ollama_base_url": "http://127.0.0.1:11434",
-  "ollama_model": "",
+  "lms_base_url": "http://127.0.0.1:1234/v1",
+  "lms_model": "",
   "twitter_language": "English",
   "nanobanana2_api_base_url": "https://generativelanguage.googleapis.com/v1beta",
   "nanobanana2_api_key": "",

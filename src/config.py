@@ -69,25 +69,25 @@ def get_headless() -> bool:
     with open(os.path.join(ROOT_DIR, "config.json"), "r") as file:
         return json.load(file)["headless"]
 
-def get_ollama_base_url() -> str:
+def get_lms_base_url() -> str:
     """
-    Gets the Ollama base URL.
+    Gets the LM Studio OpenAI-compatible base URL.
 
     Returns:
-        url (str): The Ollama base URL
+        url (str): The LM Studio base URL
     """
     with open(os.path.join(ROOT_DIR, "config.json"), "r") as file:
-        return json.load(file).get("ollama_base_url", "http://127.0.0.1:11434")
+        return json.load(file).get("lms_base_url", "http://127.0.0.1:1234/v1")
 
-def get_ollama_model() -> str:
+def get_lms_model() -> str:
     """
-    Gets the Ollama model name from the config file.
+    Gets the LM Studio model name from the config file.
 
     Returns:
-        model (str): The Ollama model name, or empty string if not set.
+        model (str): The LM Studio model name, or empty string if not set.
     """
     with open(os.path.join(ROOT_DIR, "config.json"), "r") as file:
-        return json.load(file).get("ollama_model", "")
+        return json.load(file).get("lms_model", "")
 
 def get_twitter_language() -> str:
     """

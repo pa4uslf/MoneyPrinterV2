@@ -605,8 +605,8 @@ if __name__ == "__main__":
     # Fetch MP3 Files
     fetch_songs()
 
-    # Select Ollama model — use config value if set, otherwise pick interactively
-    configured_model = get_ollama_model()
+    # Select LM Studio model — use config value if set, otherwise pick interactively
+    configured_model = get_lms_model()
     if configured_model:
         select_model(configured_model)
         success(f"Using configured model: {configured_model}")
@@ -614,17 +614,17 @@ if __name__ == "__main__":
         try:
             models = list_models()
         except Exception as e:
-            error(f"Could not connect to Ollama: {e}")
+            error(f"Could not connect to LM Studio: {e}")
             sys.exit(1)
 
         if not models:
-            error("No models found on Ollama. Pull a model first (e.g. 'ollama pull llama3.2:3b').")
+            error("No models found in LM Studio. Start the LMS server and load a model first.")
             sys.exit(1)
 
-        info("\n========== OLLAMA MODELS =========", False)
+        info("\n========== LM STUDIO MODELS =========", False)
         for idx, model_name in enumerate(models):
             print(colored(f" {idx + 1}. {model_name}", "cyan"))
-        info("==================================\n", False)
+        info("====================================\n", False)
 
         model_choice = None
         while model_choice is None:

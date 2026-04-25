@@ -72,7 +72,7 @@ The next default action is to leave this lane stable and spend attention elsewhe
 
 ### Baseline Runtime
 
-- provider: `Ollama local API`
+- provider: `LM Studio local API`
 - model: `qwen2.5:3b`
 - temperature: `0`
 - stream: `false`

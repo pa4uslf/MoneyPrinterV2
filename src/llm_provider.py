@@ -1,23 +1,25 @@
-import ollama
+import requests
 
-from config import get_ollama_base_url
+from config import get_lms_base_url
 
 _selected_model: str | None = None
 
 
-def _client() -> ollama.Client:
-    return ollama.Client(host=get_ollama_base_url())
+def _base_url() -> str:
+    return get_lms_base_url().rstrip("/")
 
 
 def list_models() -> list[str]:
     """
-    Lists all models available on the local Ollama server.
+    Lists all models available on the local LM Studio server.
 
     Returns:
         models (list[str]): Sorted list of model names.
     """
-    response = _client().list()
-    return sorted(m.model for m in response.models)
+    response = requests.get(f"{_base_url()}/models", timeout=5)
+    response.raise_for_status()
+    payload = response.json()
+    return sorted(model["id"] for model in payload.get("data", []) if model.get("id"))
 
 
 def select_model(model: str) -> None:
@@ -25,7 +27,7 @@ def select_model(model: str) -> None:
     Sets the model to use for all subsequent generate_text calls.
 
     Args:
-        model (str): An Ollama model name (must be already pulled).
+        model (str): An LM Studio model name.
     """
     global _selected_model
     _selected_model = model
@@ -40,7 +42,7 @@ def get_active_model() -> str | None:
 
 def generate_text(prompt: str, model_name: str = None) -> str:
     """
-    Generates text using the local Ollama server.
+    Generates text using the local LM Studio server.
 
     Args:
         prompt (str): User prompt
@@ -52,12 +54,18 @@ def generate_text(prompt: str, model_name: str = None) -> str:
     model = model_name or _selected_model
     if not model:
         raise RuntimeError(
-            "No Ollama model selected. Call select_model() first or pass model_name."
+            "No LM Studio model selected. Call select_model() first or pass model_name."
         )
 
-    response = _client().chat(
-        model=model,
-        messages=[{"role": "user", "content": prompt}],
+    response = requests.post(
+        f"{_base_url()}/chat/completions",
+        json={
+            "model": model,
+            "messages": [{"role": "user", "content": prompt}],
+        },
+        timeout=120,
     )
+    response.raise_for_status()
+    payload = response.json()
 
-    return response["message"]["content"].strip()
+    return payload["choices"][0]["message"]["content"].strip()

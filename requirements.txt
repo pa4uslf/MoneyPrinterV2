@@ -8,7 +8,6 @@ prettytable
 webdriver_manager
 selenium_firefox
 selenium
-ollama
 moviepy
 Pillow>=10.0.0
 yagmail

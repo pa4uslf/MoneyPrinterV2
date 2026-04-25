@@ -24,7 +24,7 @@ What this means in practice:
 
 ### Baseline Runtime
 
-- provider: `Ollama local API`
+- provider: `LM Studio local API`
 - model: `qwen2.5:3b`
 - temperature: `0`
 - stream: `false`
