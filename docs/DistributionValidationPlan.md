@@ -46,6 +46,8 @@
 
 5. 这些真实问题，究竟是谁在什么场景下表达出来的？
 6. 这些人当前最常依赖的替代方案是什么，尤其是通用 AI 是否已经足够满足他们？
+7. 如果现有替代方案不够，为什么这个时刻必须选择 Frank 的判断层，而不是继续靠 README、issue、AI、朋友、顾问或 managed service？
+8. 这条需求更像适合独立数字资产、项目级判断服务，还是更完整服务里的一个模块？
 
 如果只有点击、没有真实问题样本，这轮验证仍然是不完整的。
 
@@ -73,6 +75,11 @@
 - `current_workaround`
 - `current_ai_tools_used`
 - `current_ai_limitations`
+- `why_not_current_solution`
+- `why_us_now`
+- `consensus_stage`
+- `preferred_business_model`
+- `must_choose_us_reason`
 - `requested_next_step`
 - `matched_asset`
 - `willing_to_pay_or_book`
@@ -95,6 +102,10 @@
 - `current_workaround` 不只指 README / issue / 博客
 - 还包括用户是否已经在用 ChatGPT / Claude / Gemini / Perplexity 之类的通用 AI
 - 如果对方已经用过 AI，要尽量记录 AI 帮到了哪一步、又卡在了哪一步
+- `why_not_current_solution` 和 `why_us_now` 是避免“拿着已有资产找需求”的关键字段
+- `consensus_stage` 可先用粗粒度记录：`scenario` / `cost` / `substitute_gap` / `judgment_layer` / `next_step`
+- `preferred_business_model` 可先用粗粒度记录：`digital_asset` / `project_judgment` / `broader_service_module` / `unclear`
+- 如果这些字段答不上来，不要把该样本解释成 SOP 或付费意图，只能暂记为早期需求线索
 
 ## 本轮验证资产
 
@@ -318,6 +329,8 @@
 4. 文章 1 / 2 分别更容易吸到哪类人？
 5. checklist 更像在承接“执行需求”，还是在承接“收藏需求”？
 6. 有没有出现足够多的更深问题，值得继续往 SOP 推进？
+7. 有没有证据说明客户为什么不能继续靠 README / issue / AI / 社区 / 顾问解决？
+8. 当前更像应该推进数字资产、项目级判断服务，还是把判断能力嵌入更完整服务？
 
 如果这 6 个问题答不出来，就说明样本还不够，或者记录方式还不对。
 

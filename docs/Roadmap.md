@@ -228,12 +228,14 @@ Direction note:
 - [ ] Maintain a topic ledger of outputs vs downstream value
 - [ ] Record real-demand samples, not only funnel metrics
 - [ ] Add evidence fields for current workaround, AI tools used, AI limitations, and willingness to continue toward paid help
+- [ ] Add evidence fields or notes for why current alternatives are insufficient, why Frank is needed now, the current consensus stage, and whether the opportunity looks like a digital asset, project-level judgment service, or broader service module
 
 Execution note:
 
 - first-pass measurement spec: `docs/TopicLedgerMeasurementSpec.md`
 - seeded ledger file: `docs/topic-ledger.csv`
 - seeded distribution log: `docs/distribution-log.csv`
+- value / consensus / business-model guardrail: `docs/real-demand/价值共识与商业模式假设.md`
 
 ## Phase 8: Distribution Validation
 
@@ -254,6 +256,8 @@ Before treating a topic, asset, or SOP path as validated, ask:
 4. Are deeper replies or follow-up questions appearing?
 5. Is the push toward a paid SOP coming from repeated outside signals rather than internal excitement?
 6. When users already have README / issue / AI, do they still want a stronger judgment layer?
+7. Can we explain why customers should choose Frank instead of their current workaround?
+8. Is the strongest monetization path a standalone digital asset, a project-level judgment service, or a module inside a broader service?
 
 If the answer to most of these is "no", the next step is more validation, not broader expansion.
 

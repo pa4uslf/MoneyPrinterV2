@@ -12,6 +12,21 @@
 - Current first asset path:
   - free asset first: `开源 AI 项目部署前检查清单`
   - then paid asset: launch / hardening SOPs, templates, or other low-touch digital products
+- Real-demand guardrail:
+  - Treat the current deployment / launch-readiness direction as a priority hypothesis, not as a proven market.
+  - Do not assume customers must choose Frank because a checklist, SOP, article, or AI-assisted workflow exists.
+  - Before expanding assets, SOPs, offers, payment flows, or service positioning, check:
+    - what real problem the customer is already trying to solve;
+    - what alternatives they already use, including README/docs, issues, communities, consultants, managed services, and general-purpose AI;
+    - why those alternatives are insufficient in this specific moment;
+    - why Frank's judgment layer is more credible, ordered, reusable, or lower-risk than those alternatives;
+    - whether the customer is forming enough consensus to continue into checklist, project review, SOP, service, or purchase.
+  - If this cannot be answered from evidence, the correct next step is more real-demand validation, not stronger sales copy.
+- Canonical real-demand and business-model docs:
+  - `docs/real-demand/README.md`
+  - `docs/real-demand/真实需求识别与验证SOP.md`
+  - `docs/real-demand/2026-04-20-方向归零验证方案.md`
+  - `docs/real-demand/价值共识与商业模式假设.md`
 - Site positioning:
   - `fzhang.dev` should remain content-first.
   - Homepage CTA should bias toward owned-asset capture, not hard service selling.
