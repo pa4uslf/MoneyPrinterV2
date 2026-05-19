@@ -15,6 +15,8 @@
 - 我们是不是更适合真实决策场景
 - 我们是否只是“另一个 AI 包装层”
 - 我们相对 AI 的真实差异点是什么
+- 目标用户是否能说清为什么会选择我们的判断，而不是继续用通用 AI
+- 如果我们的输出更好，它更适合承接成数字资产、项目判断服务，还是完整服务模块
 
 ## 实验设计
 
@@ -60,6 +62,8 @@ date_tested,project_name,project_url,project_type,test_scenario,ai_model,ai_prom
 3. 哪一份更像你敢照着做的判断？
 4. 哪一份更适合收藏或发给同事？
 5. 如果要花钱，你更愿意为哪一份付费？
+6. 你为什么不能直接继续问 AI？
+7. 这份更好的输出，最适合变成 SOP、项目判断报告，还是一段完整服务？
 
 ## 最低完成标准
 
@@ -69,6 +73,7 @@ date_tested,project_name,project_url,project_type,test_scenario,ai_model,ai_prom
   - 一份 AI 输出
   - 一份我们的输出
   - 一次盲评结果
+  - 一条 `why_not_ai` 或 `why_us_now` 判断
 
 ## 结果判读
 
@@ -85,6 +90,7 @@ date_tested,project_name,project_url,project_type,test_scenario,ai_model,ai_prom
 - 我们明显更有顺序
 - 更像可承担后果的判断
 - 更适合真实上线前场景
+- 用户能说出为什么不能继续只靠 AI
 
 那么说明：
 
@@ -99,3 +105,5 @@ date_tested,project_name,project_url,project_type,test_scenario,ai_model,ai_prom
 - AI 不敢给 go / no-go
 - AI 没有优先级
 - 我们更适合作为 SOP / 团队复用材料
+- 我们是否更适合作为一次项目判断，而不是静态 SOP
+- 我们是否只是完整上线服务里的一个模块

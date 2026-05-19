@@ -10,6 +10,7 @@ The goal is:
 - connect content outputs to downstream behavior
 - avoid confusing activity with proof
 - create a shared format that future project work can update consistently
+- avoid confusing content interest with a reason to choose Frank over existing alternatives
 
 ## Why This Exists
 
@@ -30,6 +31,7 @@ Without this, it is too easy to:
 - overestimate weak topics
 - push paid assets before proof exists
 - waste time on topics that do not move anyone deeper into the system
+- mistake "users clicked" for "users need our judgment layer"
 
 ## Scope
 
@@ -39,6 +41,7 @@ This spec covers:
 - asset-level tracking
 - first-pass funnel tracking for the checklist path
 - evidence needed to justify deeper SOP pushes
+- evidence needed to explain why current alternatives are insufficient and why Frank should be chosen now
 
 This spec does not require:
 
@@ -88,6 +91,16 @@ At minimum, each row should track:
 - `product_interest_signals`
 - `paid_conversions`
 - `notes`
+
+For new evidence notes, also capture when available:
+
+- `why_not_current_solution`
+- `why_us_now`
+- `consensus_stage`
+- `preferred_business_model`
+- `must_choose_us_reason`
+
+These can live in `notes` until the ledger has enough volume to justify dedicated columns.
 
 ## Recommended Ledger Columns
 
