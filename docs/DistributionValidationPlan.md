@@ -502,12 +502,18 @@ date,channel,asset,destination_url,reason_this_channel_fits,result_after_3_to_7_
 
 ## 当前下一步
 
-1. 先为 deployment cluster 做第一轮 3 到 5 个分发动作
-2. 用 `topic-ledger.csv` 记录资产层结果
-3. 用 `distribution-log.csv` 记录渠道层结果
-4. 一周后再判断问题更偏内容还是分发
+2026-05-24 更新：
+
+当前不要继续只问“怎么分发已有文章和 checklist”。先按 `docs/real-demand/2026-05-24-市场发现冲刺计划.md` 做市场发现冲刺。
+
+1. 继续把真实外部问题样本写入 `docs/real-demand/demand-evidence-samples.csv`
+2. 先达到 30 条外部样本，再判断 deployment cluster 是否仍然是最优先市场
+3. 分发动作只作为样本来源之一，不作为当前唯一执行主线
+4. 如果样本反复指向 deployment cluster，再恢复本文件的 3 到 5 个分发动作计划
+5. 如果样本更强地指向自动化工作流、长期 Agent 或客户交付型私有 AI 工具，则先更新 market focus，再决定是否继续推文章 / checklist / SOP
 
 ## 执行参考
 
 - 4 周动作与模板：`docs/DistributionExecutionKit.md`
 - 第一批内容顺序：`docs/assets/FirstContentBatchExecutionPlan.md`
+- 市场发现冲刺：`docs/real-demand/2026-05-24-市场发现冲刺计划.md`

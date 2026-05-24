@@ -51,18 +51,20 @@ Current gap summary:
 - `shop.fzhang.dev` payment architecture is now decided in principle, but not yet implemented in code
 - `InsForge` is intentionally deferred unless the shop backend becomes a real bottleneck after payment integration
 - distribution validation has a plan, but still needs real channel actions and logged results
+- as of 2026-05-24, the immediate execution priority has shifted from distributing the existing checklist/SOP funnel to a market discovery sprint: collect at least 30 external demand samples across multiple candidate markets before deciding whether the checklist, SOP, project-judgment, or broader-service path deserves more execution time
 
 Current operating judgment:
 
 - the direction is still considered viable
 - but it is not yet a proven MoneyPrinter loop
-- the repo is currently in a `direction right / evidence thin / legacy shell still present` state
+- the repo is currently in a `direction plausible / market evidence thin / existing assets not yet validated` state
 
 Reference for this judgment:
 
 - `docs/real-demand/2026-04-15-MoneyPrinter方向判断.md`
 - `docs/real-demand/真实需求识别与验证SOP.md`
 - `docs/real-demand/2026-04-15-90天推进路线图.md`
+- `docs/real-demand/2026-05-24-市场发现冲刺计划.md`
 
 ## North Star
 
@@ -246,6 +248,15 @@ Execution note:
 - [ ] Distinguish which concrete user type and scenario each successful action is attracting
 - [ ] Run a direction-reset validation pass: 100 problem samples, 10-15 user interviews, 10-20 AI-vs-us comparisons, and 5-10 concierge judgments
 
+## Phase 9: Market Discovery Sprint
+
+- [x] Define a market discovery sprint that prevents the project from selling only the assets it already has
+- [x] Introduce `56AgencyAgents角色库参考库` as a reference layer for Discovery Coach, Trend Researcher, Feedback Synthesizer, and Reality Checker perspectives
+- [ ] Collect at least 30 external demand samples before advancing any new paid asset, checkout, or SOP launch path
+- [ ] Compare at least five candidate markets: self-hosted AI reliability, automation workflow reliability, long-running AI agent workflows, small-team launch risk, and client-delivered private AI tooling
+- [ ] Cluster every 10 samples into repeated pain, substitute gaps, cost of inaction, and likely business model
+- [ ] Decide whether the current checklist/SOP path should continue, shift to project-level judgment, become a module inside a broader service, or pause
+
 ## Demand Gates
 
 Before treating a topic, asset, or SOP path as validated, ask:
@@ -294,18 +305,17 @@ If the answer to 1-3 is "no", it is probably off-strategy.
 - [x] Draft the first paid SOP body
 - [x] Update `origin` / `upstream` remotes so this fork can be pushed cleanly
 - [x] Add a dedicated upstream sync script for the fork workflow
-- [ ] Record at least 15 real-demand samples by `2026-05-14`
-- [ ] Execute and log at least 5 real distribution actions by `2026-05-14`
-- [ ] Decide the current main ICP for the deployment cluster by `2026-05-14`
-- [ ] Re-evaluate whether article 3 should move into regular rotation only after those samples exist
+- [ ] Record at least 30 external demand samples for the 2026-05-24 market discovery sprint
+- [ ] Add specific substitute-solution notes for each candidate market, especially README/docs, issues, communities, managed services, consultants, and general-purpose AI
+- [ ] Run the first clustering pass after every 10 samples
+- [ ] Decide whether deployment checklist/SOP remains the best path only after the market discovery samples are reviewed
 
 ## Executable Shortlist
 
-1. Execute the first 3 to 5 real distribution actions for article 1 / article 2 and log them in `docs/distribution-log.csv`.
-2. Use the first real sample to distinguish whether the current bottleneck is traffic, article-to-checklist click-through, checklist / confirmation conversion, or wrong ICP targeting.
-3. Collect enough user quotes and scenario notes to name the current main ICP and their highest-cost deployment moment.
-4. Only after the first distribution sample exists, decide whether article 3 should move from bridge draft into regular distribution and SOP-intent testing.
-5. Only after repeated outside demand signals exist, decide whether the paid SOP path or `shop.fzhang.dev` deserves more execution time.
+1. Continue collecting external demand samples in `docs/real-demand/demand-evidence-samples.csv` until the first 30-sample market discovery threshold is reached.
+2. Keep the existing deployment checklist and SOP route as a candidate, not as the default next business path.
+3. Use the first 10 new samples to compare self-hosted AI reliability against automation workflow reliability and client-delivered private AI tooling.
+4. Only after repeated outside demand signals exist, decide whether the paid SOP path, a project-level judgment offer, a broader service module, or `shop.fzhang.dev` deserves more execution time.
 
 ## Portfolio Rule
 
