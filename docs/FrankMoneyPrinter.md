@@ -134,6 +134,8 @@ An idea is no longer strategically valid just because it:
 
 It also needs outside pull.
 
+That pull should be tested as economic force, not just interest: current cost, cost of inaction, budget source, trigger event, buyer/user split, and whether the demand is curiosity, efficiency, revenue, risk, or survival pressure.
+
 Minimum signals:
 
 - repeated questions from real builders in concrete deployment or self-hosting scenarios

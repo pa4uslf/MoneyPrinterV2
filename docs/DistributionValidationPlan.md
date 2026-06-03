@@ -80,6 +80,13 @@
 - `consensus_stage`
 - `preferred_business_model`
 - `must_choose_us_reason`
+- `current_spend_or_labor_cost`
+- `cost_of_inaction`
+- `budget_source`
+- `trigger_event`
+- `buyer_vs_user`
+- `replacement_target`
+- `economic_force`
 - `requested_next_step`
 - `matched_asset`
 - `willing_to_pay_or_book`
@@ -103,6 +110,7 @@
 - 还包括用户是否已经在用 ChatGPT / Claude / Gemini / Perplexity 之类的通用 AI
 - 如果对方已经用过 AI，要尽量记录 AI 帮到了哪一步、又卡在了哪一步
 - `why_not_current_solution` 和 `why_us_now` 是避免“拿着已有资产找需求”的关键字段
+- `economic_force` 是避免把神庙型好奇误判成工厂型购买压力的关键字段
 - `consensus_stage` 可先用粗粒度记录：`scenario` / `cost` / `substitute_gap` / `judgment_layer` / `next_step`
 - `preferred_business_model` 可先用粗粒度记录：`digital_asset` / `project_judgment` / `broader_service_module` / `unclear`
 - 如果这些字段答不上来，不要把该样本解释成 SOP 或付费意图，只能暂记为早期需求线索

@@ -231,6 +231,7 @@ Direction note:
 - [ ] Record real-demand samples, not only funnel metrics
 - [ ] Add evidence fields for current workaround, AI tools used, AI limitations, and willingness to continue toward paid help
 - [ ] Add evidence fields or notes for why current alternatives are insufficient, why Frank is needed now, the current consensus stage, and whether the opportunity looks like a digital asset, project-level judgment service, or broader service module
+- [ ] Add evidence fields or notes for current cost, cost of inaction, budget source, trigger event, buyer/user split, replacement target, and economic force
 
 Execution note:
 
@@ -307,7 +308,7 @@ If the answer to 1-3 is "no", it is probably off-strategy.
 - [x] Add a dedicated upstream sync script for the fork workflow
 - [ ] Record at least 30 external demand samples for the 2026-05-24 market discovery sprint
 - [ ] Add specific substitute-solution notes for each candidate market, especially README/docs, issues, communities, managed services, consultants, and general-purpose AI
-- [ ] Run the first clustering pass after every 10 samples
+- [ ] Run the first clustering pass after every 10 samples, including `economic_force` distribution and market-priority implications
 - [ ] Decide whether deployment checklist/SOP remains the best path only after the market discovery samples are reviewed
 
 ## Executable Shortlist

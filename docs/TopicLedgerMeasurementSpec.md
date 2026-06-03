@@ -274,6 +274,7 @@ This is enough to make better decisions even before a full analytics stack exist
 - 是否已经在用 AI
 - AI / README / forum / consultant 哪里不够
 - 用户更像想买数字资产，还是更像想要项目级判断
+- 用户已经付出了什么成本，以及这个问题更像好奇、效率、收入、风险还是生存压力
 
 最低建议字段：
 
@@ -290,6 +291,13 @@ This is enough to make better decisions even before a full analytics stack exist
 - `requested_next_step`
 - `willing_to_pay_or_book`
 - `matched_asset`
+- `current_spend_or_labor_cost`
+- `cost_of_inaction`
+- `budget_source`
+- `trigger_event`
+- `buyer_vs_user`
+- `replacement_target`
+- `economic_force`
 - `notes`
 
 这份记录不要求一开始就放进 repo。

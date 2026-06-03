@@ -17,6 +17,7 @@
 - 我们相对 AI 的真实差异点是什么
 - 目标用户是否能说清为什么会选择我们的判断，而不是继续用通用 AI
 - 如果我们的输出更好，它更适合承接成数字资产、项目判断服务，还是完整服务模块
+- 这次判断背后有没有真实经济强制力，而不只是对更好答案的兴趣
 
 ## 实验设计
 
@@ -64,6 +65,7 @@ date_tested,project_name,project_url,project_type,test_scenario,ai_model,ai_prom
 5. 如果要花钱，你更愿意为哪一份付费？
 6. 你为什么不能直接继续问 AI？
 7. 这份更好的输出，最适合变成 SOP、项目判断报告，还是一段完整服务？
+8. 这个问题现在不解决，会损失什么？这笔成本或预算从哪里来？
 
 ## 最低完成标准
 
@@ -74,6 +76,7 @@ date_tested,project_name,project_url,project_type,test_scenario,ai_model,ai_prom
   - 一份我们的输出
   - 一次盲评结果
   - 一条 `why_not_ai` 或 `why_us_now` 判断
+  - 一条 `economic_force` 判断
 
 ## 结果判读
 
@@ -107,3 +110,4 @@ date_tested,project_name,project_url,project_type,test_scenario,ai_model,ai_prom
 - 我们更适合作为 SOP / 团队复用材料
 - 我们是否更适合作为一次项目判断，而不是静态 SOP
 - 我们是否只是完整上线服务里的一个模块
+- 用户是在为好奇、效率、收入、风险还是生存压力做判断

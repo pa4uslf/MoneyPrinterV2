@@ -21,6 +21,7 @@
     - why those alternatives are insufficient in this specific moment;
     - why Frank's judgment layer is more credible, ordered, reusable, or lower-risk than those alternatives;
     - whether the customer is forming enough consensus to continue into checklist, project review, SOP, service, or purchase.
+    - what current cost, cost of inaction, budget source, trigger event, buyer/user split, and economic force make this more than curiosity.
   - If this cannot be answered from evidence, the correct next step is more real-demand validation, not stronger sales copy.
 - Canonical real-demand and business-model docs:
   - `docs/real-demand/README.md`
